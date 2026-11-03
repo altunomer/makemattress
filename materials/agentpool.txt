@@ -299,7 +299,7 @@ All images are hosted locally in `public/images/`:
       * **Light Theme**: Renders `logo.png` (`dark:hidden`) with a deep rich black hover drop shadow (`group-hover:drop-shadow-[0_4px_12px_rgba(0,0,0,0.95)]`).
     - Zero flicker or layout shift during theme toggles, maintaining responsive scaling and glide animations.
 
-- [v1.9.2] - 2026-11-03 [Current]
+- [v1.9.2] - 2026-11-03
   * 3-Column Mobile Product Grid (`src/components/ProductCatalog.jsx`):
     - Redesigned product catalog layout on mobile devices to a compact 3-column grid (`grid-cols-3 gap-2 sm:gap-6 lg:gap-8`).
     - Tailored mobile card paddings (`p-2 sm:p-4 lg:p-6`), rounded corners (`rounded-xl sm:rounded-2xl lg:rounded-3xl`), and typography (`text-xs sm:text-lg lg:text-2xl`).
@@ -308,6 +308,59 @@ All images are hosted locally in `public/images/`:
   * Git & GitHub Repository Creation (`makemattress`):
     - Initialized Git repository, added `.gitignore` (ignoring node_modules, dist, logs, etc.).
     - Created remote repository `makemattress` under `altunomer` and pushed all source code.
+
+- [v2.0.0] - 2026-11-03
+  * Unified 3-Capsule Fluid Header (`src/components/Header.jsx`):
+    - Eliminated absolute positioning collision bug between navigation and brand logo capsules.
+    - All 3 capsules (Logo | Navigation | Controls) are orchestrated in a rock-solid Flexbox row with identical height (`h-11 sm:h-12`) and perfect vertical baseline alignment.
+    - PDF Catalog button typography is 100% vertically and horizontally centered with `leading-none`.
+    - Integrated interactive "PRODUCTS" Mega Dropdown on desktop and accordion on mobile with direct category routing.
+  * Full WooCommerce / E-Commerce Sourcing Routing:
+    - `src/pages/ProductsPage.jsx`: Product Archive page with category pills, live count, search bar, and 3-column mobile / 3-column desktop layout.
+    - `src/pages/ProductDetailPage.jsx`: Dedicated Single Product Page featuring thumbnail gallery, comprehensive technical specifications table, B2B mixed container loading calculator, direct WhatsApp quote integration, 3D PDF catalog access, and related product suggestions.
+    - Synchronized with browser history (`#/products`, `#/product/:id`, `#/welcome-webmaster`).
+  * Webmaster Security & PaffiaBedding-Grade Admin Panel (`src/pages/AdminPage.jsx`):
+    - Updated credentials: Username `dr4carys`, Password `LetmeGetin010203*`. All hint texts and default placeholders removed.
+    - Added Category Management tab (add, edit, delete categories).
+    - Added PaffiaBedding-grade bulk product actions: multi-select checkboxes, bulk category change, bulk clone/duplicate with auto-increment ID, bulk stock/featured toggle, and bulk delete.
+    - Added RFC-4180 CSV Export and CSV File Import with validation and localStorage persistence.
+    - Added Quick Bulk Paste modal for pasting TSV/CSV rows directly from Excel/Google Sheets.
+
+- [v2.1.0] - 2026-11-03 [Current]
+  * International Multilingual SEO URL Slugs (`/:lang`, e.g., `/en`, `/tr`, `/de`):
+    - Converted SPA routing from hash-only to Google-recommended international subdirectory architecture (`/en`, `/tr`, `/de`, `/en/products`, `/tr/product/:id`).
+    - Configured automatic `activeLang` synchronization with URL path segments and `localStorage('makemattress_lang')`.
+    - Integrated Google `hreflang` alternate links into `index.html` across all 14 languages (`x-default`, `en`, `tr`, `de`, `fr`, `es`, `it`, `pt`, `nl`, `pl`, `ru`, `ar`, `zh`).
+    - Added Cloudflare Pages SPA rewrite rule in `public/_redirects` (`/* /index.html 200`) preventing 404s on deep links.
+  * 10% Overlapping Hero Value Pillar Cards (`src/components/ValuePillars.jsx`):
+    - Positioned the 4 B2B value cards (`HEPSİ TEK ELDEN!`, `SIFIR MOQ ENGELİ`, `KENDİ KALİTE LAB'IMIZ`, `KÜRESEL LİMAN İHRACATI`) over the bottom seam of the Hero Slider with a calibrated ~10% overlap (`-mt-5 sm:-mt-6 md:-mt-8 relative z-20`).
+    - Positioned Hero Slider navigation arrows/dots at `bottom-10 sm:bottom-12 md:bottom-14` maintaining ideal breathing room above the cards.
+    - Enhanced backdrop liquid glass elevation with `shadow-[0_16px_36px_rgba(28,25,23,0.12)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)]` creating a luxurious floating card aesthetic.
+
+- [v2.1.1] - 2026-11-03
+  * Translucent & Crystal Liquid Glass Navbar (`src/components/Header.jsx`):
+    - Increased transparency in both light mode (`bg-white/45`, down from 75%) and dark mode (`dark:bg-[#0C0C10]/45`, down from 80%).
+    - Boosted refractive diffusion with `backdrop-blur-2xl backdrop-saturate-180` for vibrant underlying color refraction.
+    - Added crystal bevel inner specular glow (`inset 0 1px 1.5px rgba(255,255,255,0.85)` in light, `0.20` in dark) and crisp micro-borders (`border-white/60 dark:border-white/12`).
+    - Upgraded child capsule buttons (language switcher, container, theme switch) to matching semi-translucent glass (`bg-white/40 dark:bg-white/[0.06]`).
+
+- [v2.1.3] - 2026-11-03
+  * Header transition experiments with scroll animation.
+
+- [v2.1.4] - 2026-11-03 [Current]
+  * Rock-Solid Left-Aligned Logo with Top/Sticky Scaling Architecture (`src/components/Header.jsx`):
+    - Removed all position-swapping and absolute translation between Logo and Nav.
+    - Permanent 3-capsule Flexbox row (`justify-between items-center w-full`):
+      * Capsule 1 (Left): MakeMattress Brand Logo (permanently anchored left).
+      * Capsule 2 (Center): Desktop Navigation with Products Mega Dropdown (`hidden xl:flex`).
+      * Capsule 3 (Right): Language, Container, Theme Switcher, PDF Catalog / Hamburger.
+    - Top/Sticky Responsive Scaling on Capsule 1 (Logo):
+      * At Top (`!isScrolled`): One notch larger and more prominent (`h-12 sm:h-13.5 px-4 sm:px-6`, logo image `h-6.5 sm:h-8`).
+      * On Sticky/Scrolled (`isScrolled`): Sleek compact profile (`h-10.5 sm:h-11.5 px-3.5 sm:px-4.5`, logo image `h-5.5 sm:h-6.5`).
+      * Smooth 300ms transition between top and sticky states.
+    - Zero overlap and zero alignment issues guaranteed across all viewport widths (320px to 4K).
+  * Product Visual Asset Replacement:
+    - Replaced irrelevant placeholder image for "Yatak Kulpları, Hava Kapsülleri & Ayak Paspasları" (`public/images/handles-color.jpg`) with high-resolution commercial studio photography featuring luxury stitched fabric mattress handles and electroplated chrome/brass mesh air vent capsules mounted on quilted mattress border fabric.
 
 ================================================================================
 8. GUIDELINES FOR CHATGPT CODE & COLLABORATING DEVELOPERS

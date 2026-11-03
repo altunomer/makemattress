@@ -93,8 +93,8 @@ export default function HeroSlider({ slides, activeLang = 'en' }) {
         </div>
       </div>
 
-      {/* Floating Glass Slider Controls (Bottom Right) */}
-      <div className="absolute bottom-8 right-6 sm:right-10 z-20 flex items-center gap-4 backdrop-blur-xl bg-white/75 dark:bg-black/40 border border-stone-200/80 dark:border-white/10 px-4 py-2 rounded-full shadow-lg">
+      {/* Floating Glass Slider Controls (Bottom Right - positioned above overlapping cards) */}
+      <div className="absolute bottom-10 sm:bottom-12 md:bottom-14 right-6 sm:right-10 z-20 flex items-center gap-4 backdrop-blur-xl bg-white/75 dark:bg-black/40 border border-stone-200/80 dark:border-white/10 px-4 py-2 rounded-full shadow-lg">
         {/* Progress indicators */}
         <div className="flex items-center gap-2">
           {activeSlides.map((_, idx) => (
