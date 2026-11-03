@@ -1,0 +1,325 @@
+================================================================================
+MAKEMATTRESS.COM - AGENT POOL KNOWLEDGE BASE & SYNCHRONIZATION LEDGER
+================================================================================
+Last Updated: 2026-11-03 11:30 (Local Time)
+Active Engine: Vite 6.4.5 + React 19.0.0 + Tailwind CSS v4.0.0
+Local Runtime URL: http://localhost:3005
+Primary Collaborating Agents: Antigravity AI & ChatGPT Code
+
+================================================================================
+1. PROJECT MISSION & BRAND IDENTITY
+================================================================================
+- Brand Name: MakeMattress
+- Website: makemattress.com
+- Head Office: ANBAR MAH. 54.CAD 17/A MELIKGAZI KAYSERI / TÜRKİYE
+- Core Value Proposition: "ALL IN ONE HAND!"
+  * Eliminates Minimum Order Quantity (MOQ) barriers for mattress manufacturers worldwide.
+  * Allows buyers to consolidate 10+ different mattress components, chemicals, and textiles into a single mixed-load container (20ft / 40ft HQ).
+  * Single supplier, single invoice, unified customs clearance, reducing friction from managing dozens of fragmented vendors.
+- Quality Control Pedigree:
+  * 10+ years of multinational import-export experience.
+  * In-house dedicated Quality Control department.
+  * Customized pallet sizing, reinforced roll cores, moisture-barrier packaging, and transparent pre-shipment photo reporting.
+- Contact Information:
+  * Direct Phone / WhatsApp: +90 352 311 4619
+  * Sales & Inquiries Email: info@makemattress.com
+  * Google Maps Coordinates: Kayseri Industrial Zone (Melikgazi)
+
+================================================================================
+2. TECHNICAL ARCHITECTURE & STACK
+================================================================================
+- Frontend: React 19 SPA running on Vite 6 (ready for export to Astro or Cloudflare Pages static edge).
+- Styling: Tailwind CSS v4 with custom glassmorphism layers, theme variables, and keyframe animations.
+- Icons: lucide-react (latest).
+- Theme System: Real-time Light & Dark Mode (Liquid Glass / Obsidian Glass) persisted in `localStorage('mm_theme')`.
+- Port: 3005 (configured in `vite.config.js` with `server: { port: 3005, host: true }`).
+- AI Crawlability (LLMO):
+  * `public/llms.txt`: Structured markdown catalog specifically formatted for ChatGPT, Perplexity, Claude, and Gemini crawlers.
+  * Schema.org: JSON-LD Microdata embedded for Organization, PostalAddress, and Product catalogs.
+
+================================================================================
+3. DESIGN SYSTEM & UI/UX PHILOSOPHY (LIQUID GLASS MINIMALISM)
+================================================================================
+Inspired by the quiet luxury, generous whitespace, and refined elegance of Malouf Home, combined with modern Apple-grade liquid glassmorphism:
+- Typography:
+  * Primary Font: `Roboto` (Google Fonts: 300, 400, 500, 700, 900) across body, headings, cards, and UI components.
+  * Serif Accents: `Cormorant Garamond` (available for specialized editorial flourishes).
+- Image & Visual Rules:
+  * 100% Full Color & Vibrant: No grayscale, black & white, or heavy desaturation filters on any product, brand, or slider image.
+  * Natural lighting with soft transparent liquid-glass gradients only.
+- Navbar Rules:
+  * Single-line strict alignment (`whitespace-nowrap flex-nowrap shrink-0`). Menu items must never break or wrap onto a second line.
+- Light Mode ("Daylight Alabaster Glass"):
+  * Base: `#FAF8F4` / `#F5F2EB`
+  * Panels: `bg-white/70` with `backdrop-blur-2xl`
+  * Borders: `border-black/5` with specular highlights
+  * Text: `#1E1E1C` (deep charcoal), `#6B665D` (warm stone)
+- Dark Mode ("Nocturnal Obsidian Glass"):
+  * Base: `#0C0C0F` / `#121216`
+  * Panels: `bg-[#141418]/70` with `backdrop-blur-2xl`
+  * Borders: `border-white/10` with soft bronze/gold glows
+  * Text: `#FAF8F4` (soft alabaster), `#A69F91` (muted champagne)
+- Micro-interactions & Animations:
+  * `animate-fade-in`: Smooth element reveal upon mounting or category filtering.
+  * `animate-slide-left`: Silky slide-over from the right edge for drawers.
+  * `animate-modal-zoom`: Tactile spring-like scale entry for modal dialogs.
+  * `card-hover-effect`: Smooth vertical lift (-4px), depth shadow, and image zoom on hover.
+  * `scroll-behavior: smooth`: Seamless scrolling between sections.
+  * Accessible UX: Modals and dropdowns dismiss on `Escape` key and click-outside.
+
+================================================================================
+4. 14-LANGUAGE GLOBAL LOCALIZATION ENGINE
+================================================================================
+Full language switcher in header supporting 14 major export languages with automatic HTML `lang` and `dir` (RTL/LTR) synchronization:
+1.  en - English (🇬🇧) [Default]
+2.  tr - Türkçe (🇹🇷)
+3.  de - Deutsch (🇩🇪)
+4.  fr - Français (🇫🇷)
+5.  es - Español (🇪🇸)
+6.  it - Italiano (🇮🇹)
+7.  pt - Português (🇵🇹)
+8.  nl - Nederlands (🇳🇱)
+9.  pl - Polski (🇵🇱)
+10. ka - ქართული (🇬🇪)
+11. ga - Gaeilge (🇮🇪)
+12. ru - Русский (🇷🇺)
+13. ar - العربية (🇸🇦) -> Automatic `dir="rtl"` layout switch
+14. zh - 中文 (🇨🇳)
+
+DeepL Integration (`src/utils/deeplService.js`):
+- Features both simulated high-accuracy B2B bedding translation dictionary and live DeepL API key execution.
+- Admin panel includes a 1-click "DeepL Auto-Translate" tab to populate translations across target languages.
+
+================================================================================
+5. COMPLETE PRODUCT CATALOG (13 SKUS FROM MAKEMATTRESS.COM)
+================================================================================
+All images are hosted locally in `public/images/`:
+
+1. Mattress Tape & Binding Ribbon (`mattress-tape`)
+   - Category: tapes ("Tapes & Accessories")
+   - Specs: Widths 28mm-42mm, 100% High-Tenacity Polyester, 150m rolls, custom brand weaving.
+   - Thumb: `/images/mattress-tape-thumb.jpg`
+   - Gallery: `/images/mattress-tape-g1.png`, `g2`, `g3`
+   - Video: YouTube embed (zzrhdLT98OY)
+
+2. PE Films Packaging Materials (`pe-films-packaging-materials`)
+   - Category: packaging ("Packaging & Films")
+   - Specs: 40-180 micron LDPE/LLDPE, up to 3200mm roll width, perforated & gusseted bags.
+   - Thumb: `/images/pe-films-packaging-materials-thumb.jpg`
+   - Gallery: `/images/pe-films-packaging-materials-g1.png`, `g2`, `g3`
+   - Video: YouTube embed (EoOw9fC77Vg)
+
+3. Thermobonded Felt & Isolation Pads (`felt`)
+   - Category: textiles ("Textiles, Felts & Covers")
+   - Specs: 400 gsm to 1,500 gsm, needle-punched & thermobonded cotton/synth, sheet cut.
+   - Thumb: `/images/felt-thumb.jpg`
+   - Gallery: `/images/felt-g1.png`, `g2`
+
+4. Industrial Hotmelt Adhesives (`hotmelts`)
+   - Category: adhesives ("Chemicals & Adhesives")
+   - Specs: 150°C-175°C application, solvent-free, low-odor, for pocket spring & foam assembly.
+   - Thumb: `/images/hotmelts-thumb.jpg`
+   - Gallery: `/images/hotmelts-g1.png`, `g2`, `g3`
+
+5. Custom Woven & Printed Labels (`labels`)
+   - Category: tapes ("Tapes & Accessories")
+   - Specs: High-definition damask woven, self-adhesive corner tags, up to 8 Pantone spot colors.
+   - Thumb: `/images/labels-thumb.jpg`
+   - Gallery: `/images/labels-g1.png`, `g2`, `g3`
+
+6. Roll-Pack Cardboard & Corner Protectors (`cardboard`)
+   - Category: packaging ("Packaging & Films")
+   - Specs: 250mm-450mm spiral cores, 4mm-12mm wall thickness, L/U edge protectors for bed-in-a-box.
+   - Thumb: `/images/cardboard-thumb.jpg`
+   - Gallery: `/images/cardboard-g1.png`, `g2`, `g3`
+
+7. Quilted & Knitted Zippered Covers (`zippered-cover`)
+   - Category: textiles ("Textiles, Felts & Covers")
+   - Specs: Bamboo, Tencel, CoolMax knits, #5/#7 heavy-duty zippers, 100-500 gsm quilting.
+   - Thumb: `/images/zippered-cover-thumb.jpg`
+
+8. Handles, Vents & Foot Mats (`handles-foot-mat`)
+   - Category: tapes ("Tapes & Accessories")
+   - Specs: Upholstered fabric handles, brass/chrome vents, custom embroidered showroom mats.
+   - Thumb: `/images/handles-foot-mat-thumb.jpg`
+
+9. Industrial Mattress Staples & Hog Rings (`staples`)
+   - Category: hardware ("Springs & Hardware")
+   - Specs: Series 71/80/14, galvanized zinc coating, heavy pneumatic gun compatibility.
+   - Thumb: `/images/staples-thumb.jpg`
+
+10. PU Chemicals (Polyol, TDI & MDI) (`pu-chemicals`)
+    - Category: adhesives ("Chemicals & Adhesives")
+    - Specs: Conventional Polyol, POP, TDI 80/20, MDI for continuous block foam pouring.
+    - Thumb: `/images/pu-chemicals-thumb.jpg`
+
+11. Visco, Latex & Natural Wool Pillows (`pillows`)
+    - Category: textiles ("Textiles, Felts & Covers")
+    - Specs: Molded memory foam, cooling gel, natural wool, OEM custom box packaging.
+    - Thumb: `/images/pillows-thumb.jpg`
+
+12. Knockdown Bed Bases & Headboards (`bed-baseheadboards`)
+    - Category: hardware ("Springs & Hardware")
+    - Specs: Flat-pack KD metal bed bases, Ottoman gas lift pistons, space-saving shipping.
+    - Thumb: `/images/bed-baseheadboards-thumb.jpg`
+
+13. Spunbond Nonwoven & Assembly Hardware (`other-components`)
+    - Category: hardware ("Springs & Hardware")
+    - Specs: 15-120 gsm PP nonwoven spunbond, bonded nylon quilting thread, border clips.
+    - Thumb: `/images/other-components-thumb.jpg`
+
+================================================================================
+6. B2B SPECIFIC WORKFLOWS
+================================================================================
+1. Mixed Container Load Planner (`src/components/ContainerDrawer.jsx`):
+   - Buyers click "Add to Container" on any card or modal.
+   - Opens drawer displaying selected items as visual cards with remove buttons.
+   - Destination Port & Company inputs.
+   - Generates formatted plain-text WhatsApp inquiry:
+     `Hello MakeMattress, I am planning a mixed container shipment from Kayseri...`
+2. Quote Request Form (`src/components/ContactSection.jsx`):
+   - When items are added, they appear inside the RFQ form as sleek visual glass cards.
+   - Enables users to review their component bundle before submitting.
+3. Discreet Admin Panel (`src/components/AdminPanel.jsx`):
+   - Public frontend has NO visible "Admin" buttons to keep consumer/buyer UI pristine.
+   - Access URL: Navigating to `/welcome-webmaster` (or `/#welcome-webmaster`) immediately opens the Admin Panel; closing it seamlessly resets the browser URL to `/`.
+   - Access hotkey: Press `Ctrl + Shift + A` (or `Alt + A`), or click the copyright name in footer.
+   - Features: Full CRUD on products, edit hero sliders, 1-click DeepL translations, Cloudflare Edge cache purge simulation.
+4. B2B Industry Newsletter (`src/components/NewsletterSection.jsx`):
+   - Minimalist subscription section for raw material index and freight reports.
+
+================================================================================
+7. CHANGELOG & VERSION HISTORY
+================================================================================
+- [v1.0.0] - 2026-11-02
+  * Scraped and imported all real data from makemattress.com (13 products, images, videos, texts).
+  * Initial Vite + React + Tailwind setup on port 3005.
+  * Baseline Filament-style admin panel and GeoIP simulation bar.
+
+- [v1.1.0] - 2026-11-02
+  * Removed top bar & announcement banner per user instruction.
+  * Made navbar ultra-minimal and removed public admin panel links.
+  * Added keyboard shortcut (`Ctrl+Shift+A` / `Alt+A`) and secret footer trigger for admin access.
+  * Expanded language catalog to 14 languages (added French, Georgian, Irish, Italian, Portuguese, Chinese, Polish, Dutch).
+  * Added visual product cards to the RFQ form while preserving plain-text list for WhatsApp.
+  * Added B2B Newsletter subscription section.
+  * Refined hero slider typography and airy composition.
+
+- [v1.2.0] - 2026-11-02
+  * Implemented complete Liquid Glass / Obsidian Glass aesthetic.
+  * Added persistent Light / Dark mode toggle with instant theme switching.
+  * Added frosted glassmorphism (`backdrop-blur-2xl`), specular refractive borders, ambient gradient glows.
+  * Added fluid transitions (`animate-fade-in`, `animate-slide-left`, `animate-modal-zoom`, `card-hover-effect`).
+  * Automated `dir="rtl"` layout synchronization for Arabic language.
+  * Added keyboard dismiss (`Escape`) and click-outside dismissal on all modals and dropdowns.
+  * Clean production build verified via `npm run build` (0 errors, 103.73 kB CSS).
+
+- [v1.3.0] - 2026-11-03
+  * Updated site primary typography to `Roboto` (Google Fonts: 300, 400, 500, 700, 900) across body, headings, and UI.
+  * Enforced single-line strict navbar layout (`whitespace-nowrap flex-nowrap shrink-0`) preventing any line breaks across all screens.
+  * Enforced 100% full-color, natural, vibrant images across the site: removed monochrome/grayscale filters and excessive dark overlays.
+  * Replaced hero slider images with high-resolution imagery specifically relevant to foreign trade, container shipping, and mattress hardware:
+    1. Container shipping & port terminal logistics (`/images/slider-foreign-trade.jpg`)
+    2. Industrial mattress hardware, wire coils & fastening systems (`/images/slider-hardware.jpg`)
+    3. Automated export warehouse & container consolidation facility (`/images/slider-logistics.jpg`)
+
+- [v1.4.0] - 2026-11-03
+  * Admin Panel Route: Implemented `/welcome-webmaster` direct routing listener (supporting `/welcome-webmaster` and `/#welcome-webmaster`). URL cleanly resets to `/` on close.
+  * Full-Color Product Thumbnails: Replaced all 13 legacy grayscale `*-thumb.jpg` scraped images (which had 0.0 saturation) with 100% vibrant, full-color verified product photography in `src/data/initialData.js` and `public/images/`.
+  * About Us Section: Replaced factory image with a vibrant container cargo export vessel (`/images/about-foreign-trade.jpg`), reduced dark vignette.
+  * Language Switcher: Refactored trigger button to display country flag emoji only (`🇬🇧`, `🇹🇷`, `🇩🇪`, etc.) and a minimal chevron arrow, removing bulky language text codes to keep the header uncluttered.
+  * The MakeMattress Advantage (ValuePillars): Vertically compacted (`py-12 sm:py-16`), redesigned 4 liquid-glass cards with specular top shimmer line, interactive hover lift (`hover:-translate-y-1.5`), rotating/scaling icon badges, and amber ambient glow.
+  * Dark / Light Switcher: Transformed into a tactile iOS-style sliding pill toggle switch (`w-14 h-7 rounded-full`) with sun and moon icons, positioned at the far right edge of the header.
+  * Header Logo: Removed `Export Logistics Hub` slogan next to the logo for a sleek, refined look.
+  * Container Mixed Load Button: Redesigned into a petite, compact glass capsule button (`h-7.5 px-2.5`, text `[11px]`).
+
+- [v1.5.0] - 2026-11-03
+  * 3D FlipBook PDF Viewer Port: Integrated the high-performance 3D interactive PDF FlipBook engine from `PaffiaBeddingReact` into `makemattress.com` (`public/vendor/flipbook/` with Three.js, PDF.js, HTML2Canvas, flip sound effects, and multilingual templates).
+  * PDF Catalog Modal Component (`src/components/PdfCatalogModal.jsx`): Created a Liquid Glass modal featuring page flipping animations, zoom/pan, page search, light/dark book skins (`short-white-book-view.css` and `short-black-book-view.css`), fullscreen mode, and direct PDF download fallback (`/catalog/makemattress-catalog-2026.pdf`).
+  * PDF Catalog Triggers: Added an interactive "PDF Catalog" button with 3D badge in the Header navbar, mobile drawer, Product catalog section, and Footer.
+  * Catalog -> Products Renaming: Renamed all existing "Catalog" links to "Products" (with `#products` target and `#catalog` backward-compatibility anchor) in the desktop navbar, mobile menu, slider CTA buttons, About us button, and footer navigation.
+
+- [v1.6.0] - 2026-11-03
+  * 3-Capsule Detached Sticky Navbar: Redesigned the header into 3 floating oval pill capsules (Logo | Navigation Menu | Right Tools) with subtle low-blur liquid glass (`backdrop-blur-md`), top spacing (`top-2 sm:top-3`), and side margins.
+  * Logo Hover Effect: Removed yellow/amber glow from the logo and replaced it with a sleek, pure black drop-shadow (`drop-shadow-[0_4px_12px_rgba(0,0,0,0.95)]`).
+  * PDF Catalog Button: Stripped all icons/badges, moved to the far right of the navbar as a polite, oval, solid black capsule button (`bg-black text-white hover:bg-stone-900 rounded-full h-7.5 px-3.5`).
+  * Container Button Ribbed Lines: Added subtle vertical corrugated freight container lines inside the container button.
+  * Crisp Vector SVG Country Flags (`src/components/FlagIcon.jsx`): Replaced Unicode flag emojis (which fail to render as flags on Windows) with real, high-resolution SVG flags for all 14 countries.
+  * Universal 14-Language Localization Engine (`src/data/translations.js`): Built a complete B2B translation dictionary across all 14 languages (en, tr, de, fr, es, it, pt, nl, pl, ka, ga, ru, ar, zh) wiring real-time translations across all storefront sections and components.
+  * Standalone Webmaster Admin Page (`src/pages/AdminPage.jsx`): Removed popup modal from the storefront DOM to eliminate security risks; converted `/welcome-webmaster` into a dedicated standalone single-page route with passcode gate authentication (`webmaster2026`).
+  * Default Black Theme: Initialized the application and `index.html` inline script to default to Dark Mode (`dark`), with seamless toggle to light mode available via the header switch.
+
+- [v1.6.1] - 2026-11-03
+  * Restored Browser Default Scrollbars: Completely removed custom `::-webkit-scrollbar` CSS pseudo-element styling from `src/index.css`. All page and container scrollbars now render with pure, native browser/OS styling.
+
+- [v1.7.0] - 2026-11-03
+  * Independent MakeMattress 2026 B2B Component Catalog PDF: Completely decoupled from any external or previous project source (zero Paffia references). Generated an authentic 10-page high-resolution vector PDF (`public/catalog/makemattress-catalog-2026.pdf`, 2.16 MB) using `pdf-lib` featuring MakeMattress Kayseri Melikgazi export credentials, company background, all 13 products with real full-color imagery & technical specifications, mixed-load container consolidation matrices (20ft & 40ft HQ), and direct RFQ channels.
+  * Admin Panel Dynamic PDF Catalog Management (`src/pages/AdminPage.jsx`):
+    - Added dedicated "PDF Katalog Yönetimi" tab in the `/welcome-webmaster` administrative suite.
+    - Drag-and-drop / file selector dropzone allowing the webmaster to upload a new `.pdf` catalog file directly from their computer (processed via `FileReader` and saved).
+    - Custom URL input field allowing remote, CDN, or server-hosted PDF URLs to be set with instant validation.
+    - Built-in 3D FlipBook Preview modal directly inside the admin console to verify layout, flip animations, and pagination before going live.
+    - "Varsayılana Sıfırla" one-click action to restore the default MakeMattress 2026 export catalog at any time.
+  * Storefront Dynamic PDF Binding (`src/App.jsx`):
+    - Added persistent `catalogPdf` state (`localStorage.getItem('makemattress_catalog_pdf') || '/catalog/makemattress-catalog-2026.pdf'`).
+    - Storefront header "PDF Catalog" button, mobile navigation, product catalog CTAs, and footer automatically serve the dynamic PDF set by the webmaster.
+
+- [v1.8.0] - 2026-11-03
+  * Borderless Floating Navbar: Completely removed all border lines (`border-stone-800`, `border-white/10`, button borders) from the 3 floating capsules, language selector, container button, theme toggle, and mobile menu for an ultra-sleek, borderless liquid-glass look.
+  * White Liquid Glass Light Mode: Replaced dark stone/gray navbar styling in light mode with pure, luminous white liquid glass (`bg-white/75 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)]`) paired with high-contrast `text-stone-700 hover:text-stone-950`.
+  * True Fixed Floating Navbar with Zero Top Gap: Re-engineered `<Header>` with `fixed top-2 sm:top-3 left-0 right-0 z-50` and eliminated top padding on `<main>`. The hero slider now starts seamlessly at `top: 0` underneath the floating navbar capsules without any dead empty space.
+  * Aesthetic Dropdown Scrollbar (`.dropdown-scrollbar`): Custom-crafted 5px minimal pill scrollbar in `src/index.css` for dropdown menus, drawers, and modal sheets (with subtle amber hover states) while maintaining native OS scrollbar behavior for the root page.
+  * Universal 14-Language Deep Localization (`src/data/translations.js`):
+    - Hero slider slides 1, 2, 3 (taglines, titles, subtitles, and CTA buttons) fully localized across all 14 global languages (`en, tr, de, fr, es, it, pt, nl, pl, ka, ga, ru, ar, zh`).
+    - Category tabs, search clear controls, factory specifications table headers & spec keys (Width, Material, Roll Length, MOQ, Wire Diameter, Tensile Strength, etc.), QA assurance badges, WhatsApp quote actions, About section badges, and Container Drawer interaction texts fully translated.
+
+- [v1.8.1] - 2026-11-03
+  * Morphing Masthead on Scroll (Center-to-Left Dynamic Transition):
+    - At the top of the page (`scrollY < 25`): Header is thicker and taller (`h-14 sm:h-16`, `top-4 sm:top-6`); the MakeMattress logo is positioned prominently in the **exact horizontal center** (`left-1/2 -translate-x-1/2`) at a much larger size (`h-8 sm:h-10 md:h-11`) with generous liquid-glass padding (`px-6 sm:px-8`); navigation menu is on the left, action tools on the right.
+    - On scroll movement (`scrollY >= 25`): Powered by a continuous 500ms ease-out GPU transition, the logo smoothly glides across from the Center to the Left (`left-0 translate-x-0`) while scaling down to compact standard size (`h-6 sm:h-7`); the navigation menu glides into the Center (`left-1/2 -translate-x-1/2`); all capsules contract to compact sticky size (`h-11 sm:h-12`, `top-2 sm:top-3`).
+    - Responsive for both Desktop and Mobile (on mobile screens, logo is centered & larger at top, gliding to the left upon scroll).
+
+- [v1.9.0] - 2026-11-03
+  * Responsive Overlap Resolution & Burger Breakpoint Fix:
+    - Adjusted burger menu breakpoint to `< lg` (1024px) preventing any horizontal crowding between desktop navigation links, logo, and tools on tablet/intermediate viewports.
+    - Slimmed down the mobile right capsule to ~115px by shifting secondary buttons into the mobile overlay, giving the MakeMattress Logo ample breathing room.
+    - At `< lg` breakpoint when the desktop menu hides, the Logo never disappears: it remains visible, centered in the middle space at the top, and glides smoothly to the left on scroll.
+  * Round Liquid Glass "Back to Top" Sticky Button (`src/components/BackToTopButton.jsx`):
+    - Polite, circular floating button (`w-11 h-11 sm:w-12 sm:h-12 rounded-full`) placed at `bottom-6 right-6`.
+    - Features liquid-glass blur (`backdrop-blur-xl bg-white/80 dark:bg-[#121217]/85`), soft shadow, gentle hover lift, and smooth scrolling to top when clicked. Appears automatically after scrolling down 300px.
+  * Full-Screen Animated Mobile Menu Overlay (`src/components/Header.jsx`):
+    - Replaced the compact dropdown with an immersive full-screen liquid-glass overlay (`fixed inset-0 backdrop-blur-3xl bg-[#FAF8F4]/98 dark:bg-[#0C0C0F]/98`).
+    - Features automatic body scroll lock, top bar with brand logo and circular close button, large elegant serif/sans navigation links, full-width 3D PDF catalog button, 14-language flag grid, and theme toggle switch.
+
+- [v1.9.1] - 2026-11-03
+  * Theme-Aware Dual Logo System (Vector SVG for Dark Theme & Original PNG for Light Theme):
+    - Added high-fidelity vector SVG white logo (`public/images/logo-white.svg`, exported with sharp paths and `#fff` fill) alongside high-res PNG fallback (`public/images/logo-white.png`).
+    - Configured automatic theme switching across all logo instances (`Header.jsx` desktop capsule, `Header.jsx` full-screen mobile menu overlay, and `Footer.jsx` brand column):
+      * **Dark Theme**: Renders `logo-white.svg` (`hidden dark:block`) with an elegant white neon/ambient hover drop shadow (`group-hover:drop-shadow-[0_4px_14px_rgba(255,255,255,0.75)]`).
+      * **Light Theme**: Renders `logo.png` (`dark:hidden`) with a deep rich black hover drop shadow (`group-hover:drop-shadow-[0_4px_12px_rgba(0,0,0,0.95)]`).
+    - Zero flicker or layout shift during theme toggles, maintaining responsive scaling and glide animations.
+
+- [v1.9.2] - 2026-11-03 [Current]
+  * 3-Column Mobile Product Grid (`src/components/ProductCatalog.jsx`):
+    - Redesigned product catalog layout on mobile devices to a compact 3-column grid (`grid-cols-3 gap-2 sm:gap-6 lg:gap-8`).
+    - Tailored mobile card paddings (`p-2 sm:p-4 lg:p-6`), rounded corners (`rounded-xl sm:rounded-2xl lg:rounded-3xl`), and typography (`text-xs sm:text-lg lg:text-2xl`).
+    - Optimized mobile action buttons into clean icon buttons with full text appearing on tablet/desktop.
+    - Preserved full interactive product modal trigger upon tapping cards or arrow icons.
+  * Git & GitHub Repository Creation (`makemattress`):
+    - Initialized Git repository, added `.gitignore` (ignoring node_modules, dist, logs, etc.).
+    - Created remote repository `makemattress` under `altunomer` and pushed all source code.
+
+================================================================================
+8. GUIDELINES FOR CHATGPT CODE & COLLABORATING DEVELOPERS
+================================================================================
+1. Working Directory: `c:\Users\altun\Masaüstü\Web Dev\makemattress.com`
+2. Dev Server Command: `npm run dev` (starts on port 3005 with `--host`).
+3. Build Verification: Always test with `npm run build` (`npx vite build`) before committing changes.
+4. Styling Rules:
+   - Use Tailwind CSS v4 utility classes.
+   - Support both light and dark mode for every new UI element using `dark:` variants.
+   - Maintain the `backdrop-blur-2xl` liquid glass design language.
+   - Use `font-serif` (`Cormorant Garamond`) for titles and sans for body/specs.
+5. Updating This File:
+   - When new features, components, or API integrations (e.g., Laravel backend, Cloudflare deployment) are added, append a new version entry to Section 7 and update the relevant sections above.
+================================================================================

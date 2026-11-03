@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MakeMattress | All-In-One Mattress Components & Global B2B Supply</title>
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('makemattress_theme');
+          if (t === 'light') {
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.add('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <meta name="description" content="Kayseri-based global B2B supplier of mattress components. Bypass MOQ barriers with mixed container loading for PE films, mattress tapes, hotmelts, felts, and custom accessories." />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+
+    <!-- Google Fonts: Roboto (Primary Body & Headings) + Cormorant Garamond -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Schema.org JSON-LD for AI Search & Google Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "MakeMattress",
+      "url": "https://makemattress.com",
+      "logo": "https://makemattress.com/images/logo.png",
+      "description": "Comprehensive B2B mattress component provider located in Kayseri, Turkey. Offering mixed container loading, custom branding, and transparent quality control.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Anbar Mah. 54.Cad 17/A",
+        "addressLocality": "Melikgazi",
+        "addressRegion": "Kayseri",
+        "addressCountry": "TR"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+90-352-311-4619",
+        "contactType": "sales",
+        "email": "info@makemattress.com",
+        "availableLanguage": ["English", "Turkish", "German", "Spanish", "Russian", "Arabic"]
+      }
+    }
+    </script>
+
+    <!-- Theme detection script (Instant anti-FOUC) -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('makemattress_theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-[#FAF8F4] text-[#191816] dark:bg-[#0C0C0F] dark:text-[#F5F4F0] antialiased selection:bg-[#C8A97E]/30 selection:text-[#191816] dark:selection:text-[#F5F4F0] min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
