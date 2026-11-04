@@ -347,20 +347,17 @@ All images are hosted locally in `public/images/`:
 - [v2.1.3] - 2026-11-03
   * Header transition experiments with scroll animation.
 
-- [v2.1.4] - 2026-11-03 [Current]
-  * Rock-Solid Left-Aligned Logo with Top/Sticky Scaling Architecture (`src/components/Header.jsx`):
-    - Removed all position-swapping and absolute translation between Logo and Nav.
-    - Permanent 3-capsule Flexbox row (`justify-between items-center w-full`):
-      * Capsule 1 (Left): MakeMattress Brand Logo (permanently anchored left).
-      * Capsule 2 (Center): Desktop Navigation with Products Mega Dropdown (`hidden xl:flex`).
-      * Capsule 3 (Right): Language, Container, Theme Switcher, PDF Catalog / Hamburger.
-    - Top/Sticky Responsive Scaling on Capsule 1 (Logo):
-      * At Top (`!isScrolled`): One notch larger and more prominent (`h-12 sm:h-13.5 px-4 sm:px-6`, logo image `h-6.5 sm:h-8`).
-      * On Sticky/Scrolled (`isScrolled`): Sleek compact profile (`h-10.5 sm:h-11.5 px-3.5 sm:px-4.5`, logo image `h-5.5 sm:h-6.5`).
-      * Smooth 300ms transition between top and sticky states.
-    - Zero overlap and zero alignment issues guaranteed across all viewport widths (320px to 4K).
-  * Product Visual Asset Replacement:
-    - Replaced irrelevant placeholder image for "Yatak Kulpları, Hava Kapsülleri & Ayak Paspasları" (`public/images/handles-color.jpg`) with high-resolution commercial studio photography featuring luxury stitched fabric mattress handles and electroplated chrome/brass mesh air vent capsules mounted on quilted mattress border fabric.
+- [v2.1.4] - 2026-11-03
+  * Rock-Solid Left-Aligned Logo with Top/Sticky Scaling Architecture (`src/components/Header.jsx`).
+  * Product Visual Asset Replacement (`public/images/handles-color.jpg`).
+
+- [v2.1.5] - 2026-11-04 [Current]
+  * Cloudflare Workers Production Deployment Sync (`https://makemattress.altunnomer97.workers.dev`):
+    - Configured official Cloudflare Workers configuration file (`wrangler.jsonc`) with `assets: { directory: "./dist", not_found_handling: "single-page-application" }`.
+    - Added `"deploy": "npm run build && wrangler deploy"` script to `package.json`.
+    - Removed legacy `public/_redirects` which triggered Cloudflare API error 100324 (infinite loop on workers assets).
+    - Deployed latest build (Version `ab16912a`) directly to Cloudflare Worker `makemattress`.
+    - Verified `HTTP 200 OK` across root and deep SPA routes (`/products`, `/product/:id`).
 
 ================================================================================
 8. GUIDELINES FOR CHATGPT CODE & COLLABORATING DEVELOPERS
