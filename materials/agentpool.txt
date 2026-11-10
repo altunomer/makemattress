@@ -351,13 +351,160 @@ All images are hosted locally in `public/images/`:
   * Rock-Solid Left-Aligned Logo with Top/Sticky Scaling Architecture (`src/components/Header.jsx`).
   * Product Visual Asset Replacement (`public/images/handles-color.jpg`).
 
-- [v2.1.5] - 2026-11-04 [Current]
+- [v2.1.5] - 2026-11-04
   * Cloudflare Workers Production Deployment Sync (`https://makemattress.altunnomer97.workers.dev`):
     - Configured official Cloudflare Workers configuration file (`wrangler.jsonc`) with `assets: { directory: "./dist", not_found_handling: "single-page-application" }`.
     - Added `"deploy": "npm run build && wrangler deploy"` script to `package.json`.
     - Removed legacy `public/_redirects` which triggered Cloudflare API error 100324 (infinite loop on workers assets).
     - Deployed latest build (Version `ab16912a`) directly to Cloudflare Worker `makemattress`.
     - Verified `HTTP 200 OK` across root and deep SPA routes (`/products`, `/product/:id`).
+
+- [v2.1.6] - 2026-11-04
+  * Wide Luxury Mega Dropdown Menu with 700ms Mousetrap Intent (`src/components/Header.jsx`):
+    - Re-architected the "Products / Ürünler" navigation into a near full-width (`lg:w-[94vw] lg:max-w-6xl`) luxury mega dropdown menu.
+    - Added an ambient backdrop overlay (`fixed inset-0 bg-black/45 dark:bg-black/70 backdrop-blur-sm z-40`) dimming page content when the mega menu opens.
+    - Implemented a 700ms hover intent delay (`handleMouseLeaveProducts` with `setTimeout` & `clearTimeout`) so users moving between the navbar capsule and the dropdown panel never experience abrupt closing.
+    - Designed category cards featuring high-resolution visuals, category badges, dynamic product count, subtitle descriptions, and liquid-glass hover highlights.
+    - Integrated bottom action utility bar with direct quick links to PDF Catalog, Mixed Container Planner, and All Products.
+  * Webmaster Dynamic Category & Mega Menu Management (`src/pages/AdminPage.jsx` & `src/App.jsx`):
+    - Upgraded Admin Panel Tab 2 (Kategori & Mega Menü Yönetimi) with complete CRUD, visual preset selector, local file upload, custom image URL input, badges, descriptions, and one-click "Menüde Göster / Gizle" toggle (`inMenu`).
+    - Propagated `categories` state dynamically from `App.jsx` down to `Header.jsx` so admin changes immediately reflect on the storefront mega menu in real-time.
+
+- [v2.1.7] - 2026-11-04
+  * Client-Side Automatic WebP Image Optimization Engine (`src/utils/imageOptimizer.js` & `src/pages/AdminPage.jsx`):
+    - Built a high-performance, browser-side image processing utility (`optimizeImageToWebP`) using HTML5 Canvas with bilinear anti-aliasing and smart proportional scaling (max 1200x1200px, 82% WebP quality).
+    - Prevents `localStorage` quota errors (DOMException: QuotaExceededError) by shrinking large 3-10MB mobile/raw photos into ~50-150KB high-fidelity WebP data URLs.
+    - Integrated automatic WebP file upload into **Product Editing & Creation Modal** (`isEditingProduct`) with file chooser, live preview, WEBP badge, quick component visual presets, and instant optimization telemetry (% savings, original vs optimized byte sizes, dimensions).
+    - Integrated automatic WebP file upload into **Category & Mega Menu Editor** (`catFormData`) with compression spinner, preview badge, and real-time storefront synchronization.
+  * Cloudflare Workers Production Deployment Sync (`https://makemattress.altunnomer97.workers.dev`):
+    - Deployed production build (Version `e2171da4-8e0d-48ea-a03a-bf6caa6fb1cc`).
+
+- [v2.1.8] - 2026-11-04
+  * Persistent Zero-Data-Loss PDF Catalog Architecture (`src/utils/pdfStorage.js`, `vite.config.js`, `AdminPage.jsx`, `App.jsx`):
+    - Root Cause Analysis: PDF files (3MB-30MB) converted to Base64 exceeded the browser's strict 5MB `localStorage` quota (`DOMException: QuotaExceededError`), causing uploaded files to silently fail storage and revert to `/catalog/makemattress-catalog-2026.pdf` on page refresh.
+    - Local Server Physical File Overwrite: Configured Vite dev middleware (`/api/upload-catalog-pdf` in `vite.config.js`) so uploading in the admin panel permanently writes the binary buffer directly to `public/catalog/makemattress-catalog-2026.pdf` on the physical drive.
+    - Client-Side IndexedDB Engine: Built `src/utils/pdfStorage.js` utilizing HTML5 IndexedDB, allowing 50MB+ PDF Blobs to be saved permanently in browser storage without size ceilings or quota errors.
+    - Admin Panel PDF Hub: Upgraded Tab 4 (PDF Katalog Yönetimi) with active file metadata (filename, size, update timestamp), live 3D FlipBook preview button, direct download, reset button, and manual CDN/URL input.
+    - One-Click Production Deployment Ready: When user runs "canlıyı güncelle", Vite packages the overwritten physical file from `public/catalog/` directly to Cloudflare edge.
+
+- [v2.1.9] - 2026-11-05
+  * Centered Liquid Glass Language Recommendation Modal with Subtle Overlay (`src/components/LanguageSuggestionModal.jsx`):
+    - Positioned as a centered modal with gentle background backdrop overlay (`bg-black/45 dark:bg-black/70 backdrop-blur-xs fixed inset-0 z-50 flex items-center justify-center p-4`).
+    - Cleaned up technical labels: Removed "SEO Safe", "Auto-Detect", "Bölge / Dil Tespiti" badges and verbose technical descriptions for a quiet-luxury minimalist aesthetic.
+    - Dynamic Bilingual Action Architecture:
+      1. Detected Language Title, Question & Switch Button: Strictly localized in the visitor's detected native tongue (e.g. "Diliniz Türkçe Olarak Tespit Edildi", "Türkçe Diline Geç").
+      2. Stay in Current Language Button: Strictly localized in the active browsing language (e.g. "Stay in English" when browsing `/en`, "Auf Deutsch bleiben" when browsing `/de`).
+    - Maintained 2.8s SEO-safe delay, bot bypass (`isSearchEngineBot`), Escape listener, and backdrop click dismiss.
+
+- [v2.2.0] - 2026-11-05
+  * Clean Zero-Default Mixed Container Initialization (`src/App.jsx`):
+    - Fixed hardcoded demo products (`initialProducts[0]`, `initialProducts[1]`) that were automatically populating the container on every fresh visit.
+    - Container now defaults to an empty array (`[]`) with 0 items.
+    - Implemented persistence in `localStorage('makemattress_container')` so products explicitly added by the visitor are preserved, while new visitors always start with a clean empty container.
+  * Cloudflare Workers Production Deployment Sync (`https://makemattress.altunnomer97.workers.dev`):
+    - Deployed production build (Version `39f4b213-78d0-442c-8831-55a8cfe9ed7d`).
+
+- [v2.2.1] - 2026-11-05
+  * Comprehensive PageSpeed Insights, SEO, ARD, AI & Accessibility (A11y) Overhaul:
+    - Fixed 84 `robots.txt` Errors: Created physical `public/robots.txt` allowing root and sitemap while preventing SPA HTML fallback on Cloudflare Workers.
+    - Fixed `ai-catalog.json` Malformed JSON Error: Implemented valid ARD (Agentic Resource Discovery) schema manifest at `public/ai-catalog.json`.
+    - Fixed `llms.txt` Spec Error: Updated `public/llms.txt` adhering strictly to llmstxt.org specification with explicit Markdown links `[Label](URL)` across all 13 categories, 3D PDF catalog, container calculator, QC lab, and contact endpoints.
+    - Bulk Image Payload Compression: Optimized all oversized imagery in `public/images/` saving 14.23 MB (60% payload drop from 24.2MB to 9.97MB) with companion WebP assets.
+    - LCP & Hero Slider Performance: Implemented `fetchPriority="high"` and `loading="eager"` on initial hero slide (`idx === 0`) in `HeroSlider.jsx`. Upgraded touch targets for pagination dots and navigation arrows to 36px+.
+    - Strict Heading Hierarchy Alignment: Corrected skipped heading levels (H4 to H3, H3 to H2) in `ContactSection.jsx`, `NewsletterSection.jsx`, `Footer.jsx`, and `ValuePillars.jsx`.
+    - WCAG Color Contrast Fixes: Replaced low-contrast stone-400/500 text with stone-600/700 (light) and stone-300/400 (dark) in Contact, Newsletter, and Footer.
+    - Non-Render-Blocking Google Fonts: Preloaded Google Fonts with `media="print" onload="this.media='all'"` in `index.html`.
+
+- [v2.2.2] - 2026-11-09
+  * Impeccable Design Critique Full Remediation (P0, P1, P2, P3 Overhaul):
+    - [P0 Tipografi]: Restored `Cormorant Garamond` on `.font-serif` in `src/index.css`. Headings now display in authentic editorial serif typography with balanced text wrapping (`text-wrap: balance`).
+    - [P1 Kontrast & Hero CTA]: Fixed dark mode 1.0:1 unreadable text bug on `HeroSlider.jsx` CTA with high-contrast amber (`bg-amber-400 text-stone-950 font-bold`). Removed synthetic kicker pill chip.
+    - [P1 Lokalizasyon Sızıntıları]: Unified 14-language localization in `Header.jsx` mega menu and `ContactSection.jsx` quotation form using dynamic dictionary keys (`mega_menu_title`, `moq_bypass_title`, `form_name`, `form_port`, etc.).
+    - [P2 Endüstriyel Hacim Göstergesi]: Transformed `ContainerDrawer.jsx` from a generic wishlist into an authentic B2B logistics simulator with live 20ft GP (33 CBM) / 40ft HQ (76 CBM) volumetric stowage meter, allocation percentage bar, and FOB/CIF freight metadata.
+    - [P2 AI / SaaS Klişelerinin Temizlenmesi]: Replaced uncoordinated violet/purple gradient in `ValuePillars.jsx` with architectural stone/bronze/emerald tones. Replaced developer-oriented `Schema.org` / `llms.txt` popup in `Footer.jsx` with an authentic "Export & Logistics" credential list.
+    - [P3 Mobil Grid & Kart İçi Kart Düzleştirme]: Changed `ProductCatalog.jsx` grid from rigid 3-column squeeze on mobile to responsive `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`. Flattened nested card boxes into clean industrial left-bordered specification rows and raised all functional labels above the 11px accessibility floor with 40px+ touch targets.
+
+- [v2.2.3] - 2026-11-09
+  * Front-and-Center Product Catalog & Compact Hero Architecture:
+    - Streamlined Hero Slider (`src/components/HeroSlider.jsx`): Reduced vertical footprint from 660px to a compact 390px-470px banner with refined padding and typography.
+    - Immediate Product Discovery (`src/App.jsx` & `src/components/ProductCatalog.jsx`): Placed `ProductCatalog` directly underneath the Hero Slider, bringing category filters, search, and product cards right into the visitor's first viewport fold.
+    - Repositioned Value Pillars (`src/components/ValuePillars.jsx`): Moved the 4 core pillars (*All in one hand, Zero MOQ, In-house QC, Global Export*) to sit right below the product catalog as a closing validation before the factory story.
+
+- [v2.2.4] - 2026-11-09
+  * Quotation List (Teklif Listesi) & Container Button Alignment:
+    - Removed Volumetric Container Stowage Meter: Stripped out the 20ft/40ft CBM meter and percentage bar from `ContainerDrawer.jsx` per user specification.
+    - Converted Drawer Concept to "Teklif Listesi" (Quotation List): Updated all drawer headings, empty state notes, item counts, and action buttons in `translations.js` and `ContainerDrawer.jsx` to reflect an intuitive B2B quotation list flow.
+    - Preserved Container Physical Branding: Kept the corrugated container button aesthetic with the `Box` icon intact in the sticky header (`Header.jsx`) and on product cards.
+
+- [v2.2.5] - 2026-11-09
+  * Impeccable Quieter Design Pass (Calm, Dignified & Quiet Luxury Refinement):
+    - Removed Background Blur Noise: Replaced drifting, animated glowing background blur orbs with subtle, static, low-opacity ambient warmth.
+    - Calmed Hero Slider (`src/components/HeroSlider.jsx`): Removed pulsating background glow orbs and specular top highlight lines. Replaced the high-saturation yellow CTA with refined champagne/bronze (`bg-[#D4B37F]`).
+    - Softened Mega Dropdown Overlay (`src/components/Header.jsx`): Reduced jarring dark backdrop intensity to a gentle, quiet veil (`bg-black/25 dark:bg-black/45 backdrop-blur-xs`).
+    - Architectural Card Finish (`src/components/ProductCatalog.jsx` & `src/components/ValuePillars.jsx`): Stripped synthetic specular top lines, hover glow blobs, and noisy bottom QA badges. Cards now present a calm, clean, matte-glass surface with soft depth shadows.
+
+- [v2.2.6] - 2026-11-10
+  * Comprehensive Full-Site `/impeccable quieter` Deep Refinement:
+    - Global Glass Surface Restraint (`src/index.css`): Removed ungrounded `translateY(-3px)` jumps and golden neon hover halos on `.liquid-glass` cards; reduced blur saturation from 180% to a subtle 125%; softened dark-mode shadows.
+    - Eliminated All Remaining Eyebrow Kickers & Sparkles: Removed synthetic pill kickers above headings in `QualityControlSection.jsx`, `AboutSection.jsx`, `ContactSection.jsx`, and `NewsletterSection.jsx`, letting Cormorant Garamond headings lead cleanly.
+    - Static Grounded Surfaces: Removed `.liquid-glass` hover movement from static contact info cards and embedded Google Map, removed continuous floating animation (`animate-float`) from the Kayseri hub badge, and toned down specular top lines.
+    - Calmer Header Palette (`src/components/Header.jsx`): Replaced saturated amber/black mega menu buttons and counter badges with restrained bronze/stone tones (`#8C7A58` / `#D4B37F`).
+
+- [v2.3.0] - 2026-11-10
+  * Clockwork Components B2B Architectural Layout & Filtering Logic (`HeroSlider.jsx`, `ProductCatalog.jsx`, `ProductsPage.jsx`, `App.jsx`):
+    - **Strict Preservation Rules:** Kept MakeMattress's original `#FAF8F4` / `#0C0C0F` / Bronze color palette, `Cormorant Garamond` + `Roboto` typography, and `Header.jsx` 3-capsule detached navbar untouched.
+    - **Asymmetric Split Hero Showcase (`src/components/HeroSlider.jsx`):** Adopted Clockwork's `.home-content` structure (`lg:grid-cols-12`):
+      * Right (~75% / 9 cols): Framed wide feature image carousel with clean bottom-left editorial caption and controls.
+      * Left (~25% / 3 cols): Stacked utility CTA stack featuring: (1) Intro mission statement, (2) Twin trust split boxes (`10+ Years` & `35+ Countries`), (3) Direct 3D PDF Brochure trigger tile, and (4) Direct RFQ scroll CTA tile.
+    - **Split Control Panel + High-Density Tile Grid (`src/components/ProductCatalog.jsx` & `src/pages/ProductsPage.jsx`):**
+      * Top Product Ribbon: Displays catalog title, active filter chip with quick reset (`×`), item count, search bar, and 3D catalog button.
+      * Sticky Left Control Panel (`lg:col-span-3 xl:col-span-2`): Vertical category directory with real-time item counts (transforms into scrollable horizontal pills on mobile/tablet).
+      * Right Main View (`lg:col-span-9 xl:col-span-10`): High-density 4-column desktop wholesale product tile grid (`grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`) featuring framed imagery, 1-line primary spec preview, and instant `+` / `In Container` actions.
+
+- [v2.3.1] - 2026-11-10
+  * Impeccable Quieter Refinement on Clockwork Layout & Product Detail Page:
+    - Balanced Hero Utility Column (`src/components/HeroSlider.jsx`): Softened the high-contrast solid brochure block into a calm bronze-bordered tile so the hero photograph and main headline retain primary visual authority. Reduced slider dark overlay scrim and shifted white button to soft alabaster.
+    - Unobstructed Product Photography (`src/components/ProductCatalog.jsx` & `src/pages/ProductsPage.jsx`): Removed dark floating pill tags and hover dim overlays from top of product photos, relocating category names into clean typographic headers right above the card title.
+    - Clean Product Detail View (`src/pages/ProductDetailPage.jsx`): Removed banned eyebrow pill kicker (`Sparkles`), top specular lines, amber gradient export badge, and thumbnail scale jumps; flattened nested spec boxes into crisp clean specification rows and muted neon `#25D366` WhatsApp button into calm `bg-emerald-700`.
+
+- [v2.3.2] - 2026-11-10
+  * Minimalist Single-Font System (`DM Sans`) & Radical Visual Noise Distillation (`/impeccable distill` + `quieter`):
+    - **Single Clean Geometric Font (`index.html` & `src/index.css`):** Replaced dual `Roboto` + ornamental `Cormorant Garamond` font loading with **one unified architectural sans-serif family: `DM Sans`** (`wght@300..700`). Crisp legibility, full Turkish Latin-Extended glyph support, and **zero** Impeccable `overused-font` flags.
+    - **Hero Box Reduction (`src/components/HeroSlider.jsx`):** Consolidated 6 stacked rounded boxes in the left utility column into ONE calm, border-hairline divided editorial column (`divide-y`), instantly removing visual noise above the fold.
+    - **Unboxed Gallery Catalog (`src/components/ProductCatalog.jsx` & `src/pages/ProductsPage.jsx`):** Eliminated outer rounded card frames, multiple inner horizontal divider lines (`border-t`), and heavy sidebar boxes. Products now stand cleanly on spacious borderless tiles with pure photography, clear titles, 1-line subtitle, and simple inline actions.
+    - **Unboxed Architecture Across Value Pillars, QC & Contact (`ValuePillars.jsx`, `QualityControlSection.jsx`, `ContactSection.jsx`):** Stripped dozens of redundant rounded card enclosures and icon boxes, leaving clean typographic columns and whisper-thin hairline dividers.
+    - **Deterministic Verification:** `impeccable detect --json src` exits `0` with `[]` (0 errors, 0 warnings, 0 slop findings).
+
+- [v2.3.3] - 2026-11-10
+  * 60/120fps Dropdown Performance Fix & Full Quote List ("Teklif Listesi") Sync:
+    - **GPU Compositor Blur Elimination (`Header.jsx`, `ContainerDrawer.jsx`, `ProductDetailModal.jsx`, `LanguageSuggestionModal.jsx`):**
+      * Removed expensive full-viewport `fixed inset-0 backdrop-blur-xs/xl` overlays behind the mega dropdown, container drawer, product modal, and language dialog—replacing them with pure hardware-composited opacity scrims (`bg-black/20` / `bg-black/50`).
+      * Replaced nested `backdrop-blur-2xl`/`3xl` and `backdrop-saturate-180` shaders on wide mega menu panels, inner category badges, and dropdowns with crisp matte surfaces (`bg-[#FAF8F4]` / `bg-[#121216]`) and removed animated `hover:-translate-y-1` / `scale-108` transitions inside overlays. FPS drops when opening menus are completely eliminated.
+    - **Complete Container → Quote List ("Teklif Listesi") Text Alignment (`translations.js`, `Header.jsx`, `ProductDetailPage.jsx`, `ContactSection.jsx`):**
+      * Changed remaining labels across `container_button`, `add_to_container`, `in_container`, `modal_add`, `modal_in_container`, `form_items_heading`, and `ProductDetailPage.jsx` ("Konteynere Ekle" / "Container") to **"Teklif Listesi" / "Quote List"** and **"Teklif Listesine Ekle" / "Add to Quote List"**.
+      * Preserved the physical shipping container visual aesthetic (corrugated steel lines & `Box` icon) on the top header button as explicitly requested.
+
+- [v2.3.4] - 2026-11-10
+  * Tighter Global Canvas Alignment & Compact Vertical Rhythm:
+    - Expanded Global Container Axis (`max-w-7xl` → `max-w-[1440px]`, `px-3 sm:px-5 lg:px-6`) across Navbar, Hero, Catalog, Value Pillars, QC, About, Contact, Newsletter, Footer, and Subpages, significantly tightening lateral whitespace on widescreen monitors.
+    - Compacted Vertical Section Padding: Tightened `py-20/24` spans down to clean `py-12 sm:py-16` and narrowed grid gaps (`gap-x-4 gap-y-6`) so content transitions flow naturally with less scrolling dead space.
+
+- [v2.3.5] - 2026-11-10 [Current]
+  * Cloudflare Workers Production Deployment Sync (`https://makemattress.altunnomer97.workers.dev`):
+    - Deployed production bundle via `npx wrangler deploy` (Version ID: `4b2f8a2d-04ef-442b-bd7d-b3a05e948738`, uploaded 102 optimized static & WebP assets).
+    - Verified live HTTP 200 OK on root `/` and validated live static manifests (`/robots.txt`, `/ai-catalog.json`, `/llms.txt`).
+
+
+
+
+
+
+
+
+
+
+
+
 
 ================================================================================
 8. GUIDELINES FOR CHATGPT CODE & COLLABORATING DEVELOPERS

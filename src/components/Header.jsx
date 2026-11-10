@@ -9,7 +9,7 @@ import {
   ChevronDown,
   Layers,
   ArrowRight,
-  Sparkles,
+  FileText,
   Package,
   Ribbon,
   FlaskConical,
@@ -20,6 +20,8 @@ import { getTranslation } from '../data/translations';
 import FlagIcon from './FlagIcon';
 
 export default function Header({
+  categories = initialCategories,
+  products = [],
   activeLang,
   setActiveLang,
   cartCount = 0,
@@ -41,6 +43,33 @@ export default function Header({
 
   const langDropdownRef = useRef(null);
   const productsDropdownRef = useRef(null);
+  const megaMenuPanelRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
+
+  // 700ms Mousetrap Delay: Prevents immediate closure on brief mouse movements
+  const handleMouseEnterProducts = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setProductsDropdownOpen(true);
+  };
+
+  const handleMouseLeaveProducts = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+    closeTimeoutRef.current = setTimeout(() => {
+      setProductsDropdownOpen(false);
+    }, 700);
+  };
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    };
+  }, []);
 
   // Monitor scroll
   useEffect(() => {
@@ -69,7 +98,11 @@ export default function Header({
       if (langDropdownRef.current && !langDropdownRef.current.contains(e.target)) {
         setLangDropdownOpen(false);
       }
-      if (productsDropdownRef.current && !productsDropdownRef.current.contains(e.target)) {
+      if (
+        productsDropdownRef.current &&
+        !productsDropdownRef.current.contains(e.target) &&
+        (!megaMenuPanelRef.current || !megaMenuPanelRef.current.contains(e.target))
+      ) {
         setProductsDropdownOpen(false);
       }
     };
@@ -90,9 +123,20 @@ export default function Header({
   const currentLangObj = availableLanguages.find(l => l.code === activeLang) || availableLanguages[0];
   const t = (key) => getTranslation(key, activeLang);
 
+  const defaultCategoryImages = {
+    all: '/images/slider-logistics.jpg',
+    tapes: '/images/mattress-tape-color.jpg',
+    textiles: '/images/felt-color.jpg',
+    packaging: '/images/pe-film-color.jpg',
+    adhesives: '/images/hotmelts-thumb.jpg',
+    hardware: '/images/staples-color.jpg'
+  };
+
+  const activeCategories = (categories && categories.length > 0 ? categories : initialCategories).filter(c => c.inMenu !== false);
+
   const categoryIcons = {
     tapes: Ribbon,
-    textiles: Sparkles,
+    textiles: Layers,
     adhesives: FlaskConical,
     packaging: Package,
     hardware: Boxes,
@@ -110,21 +154,172 @@ export default function Header({
   };
 
   return (
-    <header
-      className={`fixed left-0 right-0 z-50 w-full px-3 sm:px-6 pointer-events-none transition-all duration-300 ease-out ${
-        isScrolled ? 'top-2 sm:top-3' : 'top-3 sm:top-5'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4 w-full">
+    <>
+      {/* ============================================================== */}
+      {/* 1. BACKDROP OVERLAY FOR MEGA DROPDOWN                          */}
+      {/* Dims page content behind the wide menu panel                   */}
+      {/* ============================================================== */}
+      {productsDropdownOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 dark:bg-black/45 z-40 transition-opacity duration-200 pointer-events-auto"
+          onClick={() => setProductsDropdownOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* ============================================================== */}
+      {/* 2. WIDE LUXURY MEGA DROPDOWN MENU (NEAR FULL-WIDTH)            */}
+      {/* 700ms mousetrap delay keeps it open across mouse moves         */}
+      {/* ============================================================== */}
+      {productsDropdownOpen && (
+        <div
+          ref={megaMenuPanelRef}
+          onMouseEnter={handleMouseEnterProducts}
+          onMouseLeave={handleMouseLeaveProducts}
+          className="fixed left-3 right-3 sm:left-5 sm:right-5 lg:left-1/2 lg:-translate-x-1/2 lg:w-[96vw] lg:max-w-[1440px] top-16 sm:top-20 z-50 pointer-events-auto bg-[#FAF8F4] dark:bg-[#121216] rounded-2xl border border-stone-200 dark:border-white/10 shadow-xl p-4 sm:p-6 overflow-hidden"
+        >
+          {/* Top Bar inside Mega Menu */}
+          <div className="flex items-center justify-between pb-4 mb-5 border-b border-stone-200/80 dark:border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-stone-100 dark:bg-white/[0.06] border border-stone-200/80 dark:border-white/10 flex items-center justify-center text-[#8C7A58] dark:text-[#D4B37F]">
+                <Layers className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-900 dark:text-white">
+                  {t('mega_menu_title')}
+                </h3>
+                <p className="text-xs text-stone-500 dark:text-stone-400 hidden sm:block">
+                  {t('mega_menu_subtitle')}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleProductCategoryClick('all')}
+                className="text-xs font-semibold text-[#8C7A58] dark:text-[#D4B37F] hover:text-stone-900 dark:hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer group px-3 py-1.5 rounded-full hover:bg-stone-100 dark:hover:bg-white/[0.06]"
+              >
+                <span>{t('view_all_products')} ({products.length > 0 ? products.length : '13+'})</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => setProductsDropdownOpen(false)}
+                className="p-1.5 rounded-full hover:bg-stone-200/70 dark:hover:bg-white/10 text-stone-400 hover:text-stone-700 dark:hover:text-white transition-colors cursor-pointer"
+                title={t('close_menu')}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Category Cards Grid with Visuals */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {activeCategories.map(cat => {
+              const IconComponent = categoryIcons[cat.id] || Layers;
+              const catKey = `cat_${cat.id}`;
+              const label = t(catKey) !== catKey ? t(catKey) : cat.name;
+              const img = cat.image || defaultCategoryImages[cat.id] || '/images/slider-logistics.jpg';
+              const count = products.filter(p => cat.id === 'all' || p.category === cat.id).length;
+
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => handleProductCategoryClick(cat.id)}
+                  className="group flex flex-col text-left rounded-xl overflow-hidden p-2.5 transition-colors duration-200 bg-white dark:bg-white/[0.03] hover:bg-stone-100/80 dark:hover:bg-white/[0.06] border border-stone-200/80 dark:border-white/[0.08] hover:border-[#8C7A58] dark:hover:border-[#D4B37F] cursor-pointer"
+                >
+                  {/* Visual Thumbnail with Gradient and Badges */}
+                  <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-stone-200 dark:bg-stone-800 mb-2">
+                    <img
+                      src={img}
+                      alt={label}
+                      className="w-full h-full object-cover object-center"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+
+                    {/* Floating Badge */}
+                    {cat.badge && (
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-white text-[10px] font-semibold uppercase tracking-wider">
+                        {cat.badge}
+                      </div>
+                    )}
+
+                    {/* Category Icon Badge */}
+                    <div className="absolute bottom-2 right-2 w-6 h-6 rounded-md bg-white/95 dark:bg-black/80 flex items-center justify-center text-[#8C7A58] dark:text-[#D4B37F]">
+                      <IconComponent className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+
+                  {/* Category Info */}
+                  <div className="space-y-1 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-stone-900 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-1">
+                        {label}
+                      </h4>
+                      <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed font-light mt-0.5">
+                        {cat.desc || `${count} ${t('b2b_options_label')}`}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between text-[11px] text-stone-400 group-hover:text-amber-500 transition-colors border-t border-stone-200/50 dark:border-white/5 mt-2">
+                      <span className="font-mono">{count > 0 ? `${count} ${t('products_count_label')}` : t('portfolio_badge')}</span>
+                      <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Bottom Action Footer Bar */}
+          <div className="mt-5 pt-4 border-t border-stone-200/80 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-stone-600 dark:text-stone-400">
+              <Box className="w-4 h-4 text-amber-500 shrink-0" />
+              <span className="text-xs">
+                <strong className="text-stone-900 dark:text-white font-semibold">{t('moq_bypass_title')}</strong> {t('moq_bypass_desc')}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {onOpenPdfCatalog && (
+                <button
+                  onClick={() => {
+                    setProductsDropdownOpen(false);
+                    onOpenPdfCatalog();
+                  }}
+                  className="px-4 py-2 rounded-xl bg-stone-900 dark:bg-white/10 hover:bg-stone-800 dark:hover:bg-white/20 text-white text-xs font-medium flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#C4A46D]" />
+                  <span>{t('pdf_catalog_3d_btn')}</span>
+                </button>
+              )}
+              <button
+                onClick={() => handleProductCategoryClick('all')}
+                className="px-4 py-2 rounded-xl bg-[#8C7A58] hover:bg-[#7A6A4B] dark:bg-[#D4B37F] dark:hover:bg-[#E2C79D] text-white dark:text-stone-950 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer uppercase tracking-wider"
+              >
+                <span>{t('view_all_btn')}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <header
+        className={`fixed left-0 right-0 z-50 w-full px-3 sm:px-5 lg:px-6 pointer-events-none transition-all duration-300 ease-out ${
+          isScrolled ? 'top-2 sm:top-3' : 'top-3 sm:top-4'
+        }`}
+      >
+      <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-2 sm:gap-4 w-full">
         
         {/* ============================================================== */}
         {/* 1. CAPSULE 1 (LEFT): BRAND LOGO                                */}
         {/* Strictly left-aligned; larger at top, compact on scroll.       */}
         {/* ============================================================== */}
-        <div className={`rounded-full backdrop-blur-2xl backdrop-saturate-180 bg-white/45 dark:bg-[#0C0C10]/45 border border-white/60 dark:border-white/12 flex items-center shrink-0 pointer-events-auto transition-all duration-300 ease-out ${
+        <div className={`rounded-full backdrop-blur-md bg-white/80 dark:bg-[#0C0C10]/80 border border-stone-200/80 dark:border-white/10 flex items-center shrink-0 pointer-events-auto transition-all duration-300 ease-out ${
           isScrolled
-            ? 'h-10.5 sm:h-11.5 px-3 sm:px-4.5 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_1.5px_rgba(255,255,255,0.85)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_1.5px_rgba(255,255,255,0.2)]'
-            : 'h-12 sm:h-13.5 px-4 sm:px-6 shadow-[0_10px_35px_rgba(0,0,0,0.08),inset_0_1px_1.5px_rgba(255,255,255,0.9)] dark:shadow-[0_14px_45px_rgba(0,0,0,0.6),inset_0_1px_1.5px_rgba(255,255,255,0.25)]'
+            ? 'h-10.5 sm:h-11.5 px-3 sm:px-4.5 shadow-sm'
+            : 'h-12 sm:h-13.5 px-4 sm:px-6 shadow-md'
         }`}>
           <a
             href="#"
@@ -159,82 +354,29 @@ export default function Header({
         {/* 2. CAPSULE 2 (CENTER): DESKTOP NAVIGATION WITH PRODUCTS DROPDOWN */}
         {/* Centered naturally in flex layout; collapses neatly under xl. */}
         {/* ============================================================== */}
-        <nav className="hidden xl:flex rounded-full backdrop-blur-2xl backdrop-saturate-180 bg-white/45 dark:bg-[#0C0C10]/45 border border-white/60 dark:border-white/12 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_1.5px_rgba(255,255,255,0.85)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_1.5px_rgba(255,255,255,0.2)] items-center whitespace-nowrap flex-nowrap shrink-0 h-11 sm:h-12 px-6 space-x-6 xl:space-x-8 text-[12px] uppercase tracking-[0.16em] font-medium text-stone-800 dark:text-stone-200 pointer-events-auto relative transition-all duration-300">
+        <nav className="hidden xl:flex rounded-full backdrop-blur-md bg-white/80 dark:bg-[#0C0C10]/80 border border-stone-200/80 dark:border-white/10 shadow-sm items-center whitespace-nowrap flex-nowrap shrink-0 h-11 sm:h-12 px-6 space-x-6 xl:space-x-8 text-[12px] uppercase tracking-[0.16em] font-medium text-stone-800 dark:text-stone-200 pointer-events-auto relative">
           
-          {/* Products with Interactive Mega Dropdown */}
+          {/* Products Trigger Button for Wide Mega Dropdown (700ms Mousetrap Delay) */}
           <div
             className="relative"
             ref={productsDropdownRef}
-            onMouseEnter={() => setProductsDropdownOpen(true)}
-            onMouseLeave={() => setProductsDropdownOpen(false)}
+            onMouseEnter={handleMouseEnterProducts}
+            onMouseLeave={handleMouseLeaveProducts}
           >
             <button
-              onClick={() => handleProductCategoryClick('all')}
+              onClick={() => {
+                if (productsDropdownOpen) {
+                  setProductsDropdownOpen(false);
+                } else {
+                  handleMouseEnterProducts();
+                }
+              }}
               className="hover:text-stone-950 dark:hover:text-white transition-colors py-2 flex items-center gap-1.5 cursor-pointer relative group uppercase tracking-[0.16em]"
             >
               <span>{t('nav_products')}</span>
               <ChevronDown className={`w-3 h-3 text-stone-400 transition-transform duration-200 ${productsDropdownOpen ? 'rotate-180 text-amber-500' : ''}`} />
-              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-stone-900 dark:bg-amber-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+              <span className={`absolute bottom-0 left-0 h-[2px] bg-stone-900 dark:bg-amber-400 rounded-full transition-all duration-300 ${productsDropdownOpen ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
             </button>
-
-            {/* Floating Dropdown Panel */}
-            {productsDropdownOpen && (
-              <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-80 backdrop-blur-3xl bg-white/85 dark:bg-[#121216]/85 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] p-3 border border-white/60 dark:border-white/10 z-50 animate-fade-in text-stone-800 dark:text-stone-200 normal-case">
-                
-                <div className="px-3 py-2 border-b border-stone-200/60 dark:border-white/10 flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C7A58] dark:text-amber-400">
-                    B2B Ürün Kategorileri
-                  </span>
-                  <button
-                    onClick={() => handleProductCategoryClick('all')}
-                    className="text-[11px] font-semibold text-stone-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>Tümünü Gör</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-
-                <div className="space-y-1">
-                  {initialCategories.map(cat => {
-                    const IconComponent = categoryIcons[cat.id] || Layers;
-                    const catKey = `cat_${cat.id}`;
-                    const label = t(catKey) !== catKey ? t(catKey) : cat.name;
-
-                    return (
-                      <button
-                        key={cat.id}
-                        onClick={() => handleProductCategoryClick(cat.id)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs hover:bg-stone-100 dark:hover:bg-white/10 transition-colors text-left cursor-pointer group"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-white/5 flex items-center justify-center text-stone-600 dark:text-stone-300 group-hover:bg-amber-500/15 group-hover:text-amber-500 transition-colors shrink-0">
-                          <IconComponent className="w-3.5 h-3.5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-stone-800 dark:text-stone-100 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                            {label}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {onOpenPdfCatalog && (
-                  <div className="mt-2 pt-2 border-t border-stone-200/60 dark:border-white/10">
-                    <button
-                      onClick={() => {
-                        setProductsDropdownOpen(false);
-                        onOpenPdfCatalog();
-                      }}
-                      className="w-full py-2 px-3 rounded-xl bg-black hover:bg-stone-900 text-white text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-amber-400" />
-                      <span>3D Sayfalı PDF Kataloğu Aç</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           <a
@@ -283,13 +425,13 @@ export default function Header({
         {/* ============================================================== */}
         {/* 3. CAPSULE 3 (RIGHT): LANGUAGE, CONTAINER, THEME & PDF BUTTON   */}
         {/* ============================================================== */}
-        <div className="rounded-full backdrop-blur-2xl backdrop-saturate-180 bg-white/45 dark:bg-[#0C0C10]/45 border border-white/60 dark:border-white/12 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_1.5px_rgba(255,255,255,0.85)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_1.5px_rgba(255,255,255,0.2)] flex items-center gap-1.5 sm:gap-2.5 whitespace-nowrap flex-nowrap shrink-0 h-11 sm:h-12 px-2 sm:px-3 pointer-events-auto transition-all duration-300">
+        <div className="rounded-full backdrop-blur-md bg-white/80 dark:bg-[#0C0C10]/80 border border-stone-200/80 dark:border-white/10 shadow-sm flex items-center gap-1.5 sm:gap-2.5 whitespace-nowrap flex-nowrap shrink-0 h-11 sm:h-12 px-2 sm:px-3 pointer-events-auto">
           
           {/* A. Language Switcher */}
           <div className="relative hidden sm:block" ref={langDropdownRef}>
             <button
               onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="flex items-center gap-1.5 rounded-full backdrop-blur-md bg-white/40 dark:bg-white/[0.06] hover:bg-white/70 dark:hover:bg-white/12 border border-white/50 dark:border-white/10 text-stone-800 dark:text-stone-200 text-xs font-medium transition-all duration-300 cursor-pointer shrink-0 h-7.5 sm:h-8 px-2 sm:px-3 shadow-xs"
+              className="flex items-center gap-1.5 rounded-full bg-white/70 dark:bg-white/[0.06] hover:bg-white dark:hover:bg-white/12 border border-stone-200/70 dark:border-white/10 text-stone-800 dark:text-stone-200 text-xs font-medium transition-colors cursor-pointer shrink-0 h-7.5 sm:h-8 px-2 sm:px-3"
               aria-label="Select language"
               title={currentLangObj.label}
             >
@@ -298,7 +440,7 @@ export default function Header({
             </button>
 
             {langDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 max-h-84 overflow-y-auto dropdown-scrollbar backdrop-blur-3xl bg-white/85 dark:bg-[#121216]/85 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] py-2 z-50 animate-fade-in text-stone-800 dark:text-stone-200 border border-white/60 dark:border-white/10">
+              <div className="absolute right-0 mt-2 w-56 max-h-84 overflow-y-auto dropdown-scrollbar bg-white dark:bg-[#141418] rounded-2xl shadow-xl py-2 z-50 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-white/10">
                 <div className="px-3.5 py-1.5 text-[10px] uppercase font-bold tracking-widest text-[#8C7A58] dark:text-amber-400 border-b border-stone-200/60 dark:border-white/10 mb-1 flex items-center justify-between">
                   <span>14 Global Languages</span>
                   <Globe className="w-3 h-3" />
@@ -342,10 +484,10 @@ export default function Header({
               <span className="w-[1px] h-full bg-stone-700 dark:bg-white"></span>
             </div>
 
-            <Box className="w-3.5 h-3.5 text-[#8C7A58] dark:text-[#D4B37F] group-hover:rotate-6 transition-transform relative z-10" />
+            <Box className="w-3.5 h-3.5 text-[#8C7A58] dark:text-[#D4B37F] relative z-10" />
             <span className="hidden md:inline font-medium relative z-10">{t('container_button')}</span>
             {cartCount > 0 && (
-              <span className="bg-amber-500 text-stone-950 text-[9.5px] font-bold px-1.5 py-0.2 rounded-full leading-none shadow-xs relative z-10">
+              <span className="bg-[#8C7A58] text-white dark:bg-[#D4B37F] dark:text-stone-950 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none relative z-10">
                 {cartCount}
               </span>
             )}
@@ -357,16 +499,16 @@ export default function Header({
             role="switch"
             aria-checked={theme === 'dark'}
             onClick={toggleTheme}
-            className="rounded-full backdrop-blur-md bg-white/35 dark:bg-black/35 border border-white/40 dark:border-white/10 p-0.5 relative cursor-pointer transition-all duration-300 flex items-center shadow-inner shrink-0 w-11 sm:w-13 h-6.5 sm:h-7"
+            className="rounded-full backdrop-blur-md bg-white/35 dark:bg-black/35 border border-stone-200/70 dark:border-white/10 p-0.5 relative cursor-pointer transition-all duration-300 flex items-center shrink-0 w-11 sm:w-13 h-6.5 sm:h-7"
             title={theme === 'dark' ? t('theme_light') : t('theme_dark')}
             aria-label="Toggle light or dark theme"
           >
             <div className="w-full flex justify-between items-center px-1.5 pointer-events-none">
-              <Sun className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-amber-500" />
+              <Sun className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-[#8C7A58]" />
               <Moon className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-stone-400" />
             </div>
             <div
-              className={`absolute top-0.5 bottom-0.5 rounded-full bg-amber-400 dark:bg-stone-100 shadow-md flex items-center justify-center transition-transform duration-300 ease-out w-5.5 sm:w-6 h-5.5 sm:h-6 ${
+              className={`absolute top-0.5 bottom-0.5 rounded-full bg-[#D4B37F] dark:bg-stone-100 shadow-xs flex items-center justify-center transition-transform duration-300 ease-out w-5.5 sm:w-6 h-5.5 sm:h-6 ${
                 theme === 'dark' ? 'translate-x-4.5 sm:translate-x-6' : 'translate-x-0'
               }`}
             >
@@ -403,7 +545,7 @@ export default function Header({
       {/* 4. FULL-SCREEN ANIMATED MOBILE MENU OVERLAY                     */}
       {/* ============================================================== */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto dropdown-scrollbar backdrop-blur-3xl bg-[#FAF8F4]/98 dark:bg-[#0C0C0F]/98 flex flex-col justify-between p-6 sm:p-10 animate-fade-in pointer-events-auto text-stone-900 dark:text-white">
+        <div className="fixed inset-0 z-50 overflow-y-auto dropdown-scrollbar bg-[#FAF8F4] dark:bg-[#0C0C0F] flex flex-col justify-between p-6 sm:p-10 pointer-events-auto text-stone-900 dark:text-white">
           {/* Top Bar inside Overlay */}
           <div className="flex items-center justify-between pb-6 border-b border-stone-200/70 dark:border-white/10">
             <a
@@ -585,5 +727,6 @@ export default function Header({
         </div>
       )}
     </header>
+  </>
   );
 }

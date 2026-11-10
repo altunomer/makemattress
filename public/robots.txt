@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /welcome-webmaster
+Disallow: /admin
+
+# Sitemaps & AI manifests
+Sitemap: https://makemattress.com/sitemap.xml

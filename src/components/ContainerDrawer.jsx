@@ -29,16 +29,16 @@ export default function ContainerDrawer({
   // Plain-text formatted list specifically for WhatsApp
   const textSummary = items.map(i => `• ${i.name} (Ref: ${i.slug})`).join('\n');
   const whatsappMsg = encodeURIComponent(
-    `Hello MakeMattress,\nI am planning a mixed container shipment from Kayseri with the following components:\n\n${textSummary}\n\nTarget Port: ${targetPort || 'Pending'}\nCompany: ${companyName || 'Not specified'}\nPlease share CIF/FOB rates.`
+    `Hello MakeMattress,\nI am requesting a quotation for the following mattress components from Kayseri:\n\n${textSummary}\n\nTarget Port: ${targetPort || 'Pending'}\nCompany: ${companyName || 'Not specified'}\nPlease share CIF/FOB pricing and lead times.`
   );
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-hidden backdrop-blur-xl bg-black/60 dark:bg-black/80 flex justify-end animate-fade-in"
+      className="fixed inset-0 z-50 overflow-hidden bg-black/50 dark:bg-black/70 flex justify-end"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md backdrop-blur-2xl bg-white/95 dark:bg-[#121217]/95 h-full shadow-[0_0_60px_rgba(0,0,0,0.4)] flex flex-col justify-between border-l border-stone-200/80 dark:border-white/10 relative animate-slide-left"
+        className="w-full max-w-md bg-[#FAF8F4] dark:bg-[#121217] h-full shadow-2xl flex flex-col justify-between border-l border-stone-200/80 dark:border-white/10 relative animate-slide-left"
         onClick={e => e.stopPropagation()}
       >
         {/* Specular line down the left border */}
@@ -82,12 +82,12 @@ export default function ContainerDrawer({
               </p>
             </div>
           ) : (
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               <div className="flex justify-between items-center text-xs text-stone-500 dark:text-stone-400">
-                <span className="font-medium">{items.length} {t('drawer_selected_count')}</span>
+                <span className="font-semibold text-stone-800 dark:text-stone-200">{items.length} {t('drawer_selected_count')}</span>
                 <button
                   onClick={onClear}
-                  className="text-[11px] text-red-500 hover:underline cursor-pointer font-medium"
+                  className="text-xs text-red-500 hover:underline cursor-pointer font-medium"
                 >
                   {t('drawer_clear_all')}
                 </button>
@@ -112,10 +112,10 @@ export default function ContainerDrawer({
                       <h4 className="text-xs font-semibold text-stone-900 dark:text-stone-100 truncate">
                         {localizedItemName}
                       </h4>
-                      <p className="text-[10px] text-stone-500 dark:text-stone-400 truncate">
+                      <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
                         {localizedItemSubtitle}
                       </p>
-                      <span className="inline-block mt-1 text-[9px] uppercase font-bold text-[#8C7A58] dark:text-[#D4B37F] bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      <span className="inline-block mt-1 text-[11px] uppercase font-semibold text-[#8C7A58] dark:text-[#D4B37F] bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
                         {item.moqInfo || t('moq_consolidated')}
                       </span>
                     </div>
@@ -134,7 +134,7 @@ export default function ContainerDrawer({
               {/* Port & Company Inputs */}
               <div className="pt-4 border-t border-stone-200/70 dark:border-white/[0.08] space-y-3">
                 <div>
-                  <label className="block text-[10px] uppercase font-bold tracking-wider text-stone-500 dark:text-stone-400 mb-1">
+                  <label className="block text-xs font-semibold tracking-wide text-stone-700 dark:text-stone-300 mb-1.5">
                     {t('drawer_port_label')}
                   </label>
                   <input
@@ -146,7 +146,7 @@ export default function ContainerDrawer({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase font-bold tracking-wider text-stone-500 dark:text-stone-400 mb-1">
+                  <label className="block text-xs font-semibold tracking-wide text-stone-700 dark:text-stone-300 mb-1.5">
                     {t('drawer_company_label')}
                   </label>
                   <input

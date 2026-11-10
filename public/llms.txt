@@ -7,28 +7,30 @@
 ## Company Overview
 MakeMattress is a leading Turkish B2B supplier and exporter of components, raw materials, and machinery consumables for mattress and bedding manufacturers worldwide. Located in the industrial manufacturing hub of Kayseri, Türkiye, MakeMattress provides comprehensive, end-to-end procurement under one roof with transparent quality control and container consolidation.
 
-## Core Product Catalog
-- **PE Films & Packaging Materials**: Heavy-duty PE film rolls, perforated shrink bags, and protective covers engineered for automated packaging lines.
-- **Hotmelts & Chemical Adhesives**: High-performance, low-odor, eco-friendly hotmelt adhesives for pocket spring assembly and foam bonding.
-- **Handles & Foot Mats**: Custom embroidered, woven, and plastic mattress handles, air vents, and corner protectors.
-- **Labels**: Custom woven labels, thermal transfer printed labels, and high-clarity self-adhesive branding tags.
-- **Cardboard & Corner Protectors**: Roll-pack packaging cardboard tubes, corrugated edge protectors for bed-in-a-box shipping.
-- **Pillows**: Natural wool, shredded visco memory foam, latex, and microfiber pillow inserts.
-- **Mattress Tape**: High-tensile jacquard and twill woven binding tapes in custom widths (28mm to 45mm), colors, and branded logos.
-- **Felt**: 400 GSM to 1500 GSM thermo-bonded hard and soft needle-punched felt pads, duo pads for spring isolation.
-- **Bed Base & Headboards**: Knockdown (KD) demountable metal bed frames, Ottoman lift mechanisms, and upholstered headboards.
-- **Staples**: Industrial galvanized pneumatic staples, hog rings, and C-rings for mattress border and spring assembly.
-- **PU Chemicals**: Polyol, TDI, MDI, and blowing agents for flexible polyurethane foam pouring.
-- **Other Components & Nonwoven**: Spunbond PP nonwoven fabrics (15 GSM to 120 GSM), tufting cords, quilting threads, and border clips.
-- **Zippered Covers**: Custom knitted and jacquard mattress encasements with heavy-duty zips.
+## Core Product Catalog & Direct Links
+- [PE Films & Packaging Materials](https://makemattress.com/en/products?category=packaging): Heavy-duty PE film rolls, perforated shrink bags, and protective covers engineered for automated packaging lines.
+- [Hotmelts & Chemical Adhesives](https://makemattress.com/en/products?category=adhesives): High-performance, low-odor, eco-friendly hotmelt adhesives for pocket spring assembly and foam bonding.
+- [Handles, Vents & Foot Mats](https://makemattress.com/en/products?category=accessories): Custom embroidered, woven, and plastic mattress handles, air vents, and corner protectors.
+- [Custom Woven & Printed Labels](https://makemattress.com/en/products?category=accessories): Custom woven labels, thermal transfer printed labels, and high-clarity self-adhesive branding tags.
+- [Cardboard & Corner Protectors](https://makemattress.com/en/products?category=packaging): Roll-pack packaging cardboard tubes, corrugated edge protectors for bed-in-a-box shipping.
+- [Pillows & Inserts](https://makemattress.com/en/products?category=textiles): Natural wool, shredded visco memory foam, latex, and microfiber pillow inserts.
+- [Mattress Tape & Binding Ribbon](https://makemattress.com/en/products?category=tapes): High-tensile jacquard and twill woven binding tapes in custom widths (28mm to 45mm), colors, and branded logos.
+- [Thermobonded Felt & Isolation Pads](https://makemattress.com/en/products?category=textiles): 400 GSM to 1500 GSM thermo-bonded hard and soft needle-punched felt pads, duo pads for spring isolation.
+- [Knockdown Bed Bases & Headboards](https://makemattress.com/en/products?category=hardware): Knockdown (KD) demountable metal bed frames, Ottoman lift mechanisms, and upholstered headboards.
+- [Industrial Mattress Staples & Hog Rings](https://makemattress.com/en/products?category=hardware): Industrial galvanized pneumatic staples, hog rings, and C-rings for mattress border and spring assembly.
+- [PU Chemicals (Polyol, TDI & MDI)](https://makemattress.com/en/products?category=adhesives): Polyol, TDI, MDI, and blowing agents for flexible polyurethane foam pouring.
+- [Spunbond Nonwoven & Assembly Hardware](https://makemattress.com/en/products?category=textiles): Spunbond PP nonwoven fabrics (15 GSM to 120 GSM), tufting cords, quilting threads, and border clips.
+- [Quilted & Knitted Zippered Covers](https://makemattress.com/en/products?category=textiles): Custom knitted and jacquard mattress encasements with heavy-duty zips.
 
-## B2B Export & Service Features
-- **Mixed Container Loading**: Clients can mix 10+ different component SKUs in a single 20ft or 40ft HQ container, eliminating high MOQ hurdles.
-- **In-House Quality Control**: 10+ years international logistics and trade experience. Customized pallet sizing, moisture-proof loading, and pre-shipment inspection reports.
-- **Global Shipping**: Regular shipments to Europe, Middle East, Americas, Central Asia, and Africa.
+## Key Resources & Documentation
+- [Full Product Catalog & Specifications](https://makemattress.com/en/products): Browse the full catalog with technical specifications, roll lengths, and MOQ parameters.
+- [3D Interactive FlipBook & PDF Catalog](https://makemattress.com/catalog/makemattress-catalog-2026.pdf): Complete 2026 technical catalog available for online viewing and direct PDF download.
+- [Mixed Container Loading Calculator](https://makemattress.com/en#container-info): Consolidate multiple materials into a single 20ft or 40ft HQ container.
+- [In-House Quality Control & Lab Testing](https://makemattress.com/en#quality): 10+ years international logistics and trade experience with photo reports and tensile testing.
+- [Contact & Export Inquiries](https://makemattress.com/en#contact): Direct sales team, WhatsApp chat, and quotation form.
 
 ## Contact Information
 - Address: Anbar Mah. 54. Cad. 17/A, Melikgazi, Kayseri, Türkiye
-- Phone: +90 352 311 4619
+- Phone / WhatsApp: +90 352 311 4619
 - Email: info@makemattress.com
 - Website: https://makemattress.com

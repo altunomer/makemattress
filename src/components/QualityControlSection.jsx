@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, CheckCircle2, Sliders, PackageCheck, Eye, Award, Sparkles } from 'lucide-react';
+import { ShieldCheck, PackageCheck, Eye } from 'lucide-react';
 import { getTranslation } from '../data/translations';
 
 export default function QualityControlSection({ activeLang = 'en' }) {
@@ -24,16 +24,11 @@ export default function QualityControlSection({ activeLang = 'en' }) {
   ];
 
   return (
-    <section id="quality" className="py-24 relative z-10 border-b border-stone-200/70 dark:border-white/[0.06] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+    <section id="quality" className="py-12 sm:py-16 relative z-10 border-b border-stone-200/70 dark:border-white/[0.06] transition-colors duration-300">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Text Column */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full backdrop-blur-md bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 text-[#8C7A58] dark:text-[#D4B37F] text-[11px] font-bold uppercase tracking-widest shadow-inner">
-              <Award className="w-3.5 h-3.5 text-amber-500" />
-              <span>{t('qc_badge')}</span>
-            </div>
-
+          <div className="lg:col-span-6 space-y-5">
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 dark:text-stone-100 font-normal leading-tight">
               {t('qc_title')}
             </h2>
@@ -48,41 +43,39 @@ export default function QualityControlSection({ activeLang = 'en' }) {
             </div>
 
             {/* Metric counters */}
-            <div className="pt-4 flex items-center gap-6">
+            <div className="pt-4 flex items-center gap-6 sm:gap-8">
               <div>
-                <span className="block font-serif text-3xl sm:text-4xl font-bold text-[#8C7A58] dark:text-[#D4B37F]">10+</span>
-                <span className="text-[11px] uppercase tracking-wider text-stone-500 dark:text-stone-400 font-semibold">{t('qc_stat_exp')}</span>
+                <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#8C7A58] dark:text-[#D4B37F]">10+</span>
+                <span className="text-xs uppercase tracking-wider text-stone-600 dark:text-stone-400 font-medium">{t('qc_stat_exp')}</span>
               </div>
-              <div className="h-10 w-[1px] bg-stone-300 dark:bg-white/10"></div>
+              <div className="h-10 w-[1px] bg-stone-200 dark:bg-white/10"></div>
               <div>
-                <span className="block font-serif text-3xl sm:text-4xl font-bold text-[#8C7A58] dark:text-[#D4B37F]">35+</span>
-                <span className="text-[11px] uppercase tracking-wider text-stone-500 dark:text-stone-400 font-semibold">{t('qc_stat_countries')}</span>
+                <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#8C7A58] dark:text-[#D4B37F]">35+</span>
+                <span className="text-xs uppercase tracking-wider text-stone-600 dark:text-stone-400 font-medium">{t('qc_stat_countries')}</span>
               </div>
-              <div className="h-10 w-[1px] bg-stone-300 dark:bg-white/10"></div>
+              <div className="h-10 w-[1px] bg-stone-200 dark:bg-white/10"></div>
               <div>
-                <span className="block font-serif text-3xl sm:text-4xl font-bold text-[#8C7A58] dark:text-[#D4B37F]">100%</span>
-                <span className="text-[11px] uppercase tracking-wider text-stone-500 dark:text-stone-400 font-semibold">{t('qc_stat_inspected')}</span>
+                <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#8C7A58] dark:text-[#D4B37F]">100%</span>
+                <span className="text-xs uppercase tracking-wider text-stone-600 dark:text-stone-400 font-medium">{t('qc_stat_inspected')}</span>
               </div>
             </div>
           </div>
 
-          {/* Right Protocol Cards */}
-          <div className="lg:col-span-6 space-y-4">
+          {/* Right Protocol Steps (Unboxed Typographic Rows) */}
+          <div className="lg:col-span-6 divide-y divide-stone-200/70 dark:divide-white/[0.06] border-t border-b border-stone-200/70 dark:border-white/[0.06]">
             {steps.map((step, idx) => {
               const Icon = step.icon;
               return (
                 <div
                   key={idx}
-                  className="liquid-glass p-5 rounded-2xl flex items-start gap-4 hover:border-amber-500/30 transition-all duration-300"
+                  className="py-5 flex items-start gap-4"
                 >
-                  <div className="p-3 rounded-xl backdrop-blur-md bg-stone-100/90 dark:bg-white/[0.08] text-[#8C7A58] dark:text-[#D4B37F] border border-stone-200/80 dark:border-white/10 shrink-0">
-                    <Icon className="w-5 h-5" />
-                  </div>
+                  <Icon className="w-5 h-5 text-[#8C7A58] dark:text-[#D4B37F] shrink-0 mt-0.5 stroke-[1.75]" />
                   <div className="space-y-1">
-                    <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+                    <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                       {step.title}
                     </h3>
-                    <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-light">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed font-normal">
                       {step.desc}
                     </p>
                   </div>

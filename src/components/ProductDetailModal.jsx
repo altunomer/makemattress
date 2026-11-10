@@ -57,11 +57,11 @@ export default function ProductDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto backdrop-blur-xl bg-black/65 dark:bg-black/80 flex items-center justify-center p-4 sm:p-6 animate-fade-in"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/55 dark:bg-black/75 flex items-center justify-center p-4 sm:p-6"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl backdrop-blur-2xl bg-white/95 dark:bg-[#121217]/95 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.3)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.8)] border border-stone-200/80 dark:border-white/10 overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-modal-zoom"
+        className="relative w-full max-w-4xl bg-[#FAF8F4] dark:bg-[#121217] rounded-2xl shadow-2xl border border-stone-200/80 dark:border-white/10 overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-modal-zoom"
         onClick={e => e.stopPropagation()}
       >
         {/* Top Specular Line */}
@@ -132,7 +132,7 @@ export default function ProductDetailModal({
                 }`}
               >
                 <Play className="w-5 h-5 text-amber-400" />
-                <span className="text-[9px] uppercase tracking-wider font-bold mt-1">Video</span>
+                <span className="text-xs uppercase tracking-wider font-bold mt-1">Video</span>
               </button>
             )}
           </div>
@@ -142,7 +142,7 @@ export default function ProductDetailModal({
         <div className="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto dropdown-scrollbar">
           <div className="space-y-5">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full backdrop-blur-md bg-stone-100 dark:bg-white/[0.06] border border-stone-200/80 dark:border-white/10 text-[#8C7A58] dark:text-[#D4B37F] text-[10px] uppercase font-bold tracking-[0.2em] mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-md bg-stone-100 dark:bg-white/[0.06] border border-stone-200/80 dark:border-white/10 text-[#8C7A58] dark:text-[#D4B37F] text-xs uppercase font-semibold tracking-wider mb-2">
                 <span>{localizedCategoryName}</span>
                 <span>&bull;</span>
                 <span className="font-mono">Ref: {product.slug}</span>
@@ -163,15 +163,15 @@ export default function ProductDetailModal({
             {/* Technical Specifications Table */}
             {product.specs && (
               <div className="rounded-2xl border border-stone-200/80 dark:border-white/[0.08] backdrop-blur-md bg-stone-50/60 dark:bg-white/[0.03] overflow-hidden text-xs">
-                <div className="px-4 py-2 bg-stone-100/70 dark:bg-white/[0.05] font-bold text-stone-800 dark:text-stone-200 uppercase text-[10px] tracking-wider border-b border-stone-200/60 dark:border-white/[0.06] flex items-center justify-between">
+                <div className="px-4 py-2.5 bg-stone-100/70 dark:bg-white/[0.05] font-bold text-stone-800 dark:text-stone-200 uppercase text-xs tracking-wider border-b border-stone-200/60 dark:border-white/[0.06] flex items-center justify-between">
                   <span>{t('spec_factory_specs')}</span>
-                  <span className="text-[9px] text-[#8C7A58] dark:text-[#D4B37F]">{t('spec_verified_qa')}</span>
+                  <span className="text-[11px] text-[#8C7A58] dark:text-[#D4B37F] font-semibold">{t('spec_verified_qa')}</span>
                 </div>
                 <div className="divide-y divide-stone-200/60 dark:divide-white/[0.06]">
                   {Object.entries(product.specs).map(([specKey, specVal], idx) => {
                     const localizedKey = specMap[specKey] && t(specMap[specKey]) !== specMap[specKey] ? t(specMap[specKey]) : specKey;
                     return (
-                      <div key={idx} className="px-4 py-2.5 flex justify-between items-center">
+                      <div key={idx} className="px-4 py-2.5 flex justify-between items-center text-xs">
                         <span className="text-stone-500 dark:text-stone-400 font-medium">{localizedKey}</span>
                         <span className="text-stone-900 dark:text-stone-100 font-semibold text-right max-w-[60%]">{specVal}</span>
                       </div>
@@ -182,7 +182,7 @@ export default function ProductDetailModal({
             )}
 
             {/* B2B Assurance Badges */}
-            <div className="grid grid-cols-2 gap-2 text-[11px] text-stone-600 dark:text-stone-300 pt-1">
+            <div className="grid grid-cols-2 gap-2 text-xs text-stone-600 dark:text-stone-300 pt-1">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>{t('badge_inhouse_qa')}</span>

@@ -58,12 +58,60 @@ export const initialSliders = [
 ];
 
 export const initialCategories = [
-  { id: "all", name: "All Components", icon: "Layers" },
-  { id: "packaging", name: "Packaging & Films", icon: "Package" },
-  { id: "adhesives", name: "Chemicals & Adhesives", icon: "FlaskConical" },
-  { id: "tapes", name: "Tapes & Accessories", icon: "Ribbon" },
-  { id: "textiles", name: "Textiles, Felts & Covers", icon: "Sparkles" },
-  { id: "hardware", name: "Springs & Hardware", icon: "Boxes" }
+  {
+    id: "all",
+    name: "All Components",
+    icon: "Layers",
+    image: "/images/slider-logistics.jpg",
+    desc: "10'dan fazla yatak bileşenini tek faturada karma konteynerde birleştirin.",
+    badge: "Konsolide Portföy",
+    inMenu: true
+  },
+  {
+    id: "tapes",
+    name: "Tapes & Accessories",
+    icon: "Ribbon",
+    image: "/images/mattress-tape-color.jpg",
+    desc: "Özel jakar dokuma kenar biyesi, fitiller, nakışlı kulplar ve havalandırma kapsülleri.",
+    badge: "100+ Desen",
+    inMenu: true
+  },
+  {
+    id: "textiles",
+    name: "Textiles, Felts & Covers",
+    icon: "Sparkles",
+    image: "/images/felt-color.jpg",
+    desc: "Termo-keçe, nonwoven spunbond tela ve örme/jakarlı yatak kumaşları.",
+    badge: "Yüksek Yoğunluk",
+    inMenu: true
+  },
+  {
+    id: "packaging",
+    name: "Packaging & Films",
+    icon: "Package",
+    image: "/images/pe-film-color.jpg",
+    desc: "Rulo pres paketleme filmleri, ağır hizmet PE torbalar ve köşe kartonları.",
+    badge: "Roll-Pack Uyumlu",
+    inMenu: true
+  },
+  {
+    id: "adhesives",
+    name: "Chemicals & Adhesives",
+    icon: "FlaskConical",
+    image: "/images/hotmelts-thumb.jpg",
+    desc: "Torba yay tutkalları, hotmelt yapıştırıcılar ve sünger kimyasalları.",
+    badge: "Kokusuz & Hızlı",
+    inMenu: true
+  },
+  {
+    id: "hardware",
+    name: "Springs & Hardware",
+    icon: "Boxes",
+    image: "/images/staples-color.jpg",
+    desc: "Paket yay telleri, bonel karkaslar, çelik zımba telleri ve C-ring montaj halkaları.",
+    badge: "Otomatik Hatlar",
+    inMenu: true
+  }
 ];
 
 export const initialProducts = [

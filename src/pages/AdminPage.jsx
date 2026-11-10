@@ -28,10 +28,23 @@ import {
   Search,
   CheckSquare,
   Square,
-  AlertCircle
+  AlertCircle,
+  Image as ImageIcon,
+  EyeOff,
+  LayoutGrid,
+  Loader2,
+  Zap
 } from 'lucide-react';
 import { translateContentWithDeepL } from '../utils/deeplService';
 import { initialCategories } from '../data/initialData';
+import { optimizeImageToWebP } from '../utils/imageOptimizer';
+import {
+  uploadPdfToLocalServer,
+  savePdfToIndexedDB,
+  clearPdfFromIndexedDB,
+  getCatalogMetadata,
+  DEFAULT_CATALOG_PATH
+} from '../utils/pdfStorage';
 import PdfCatalogModal from '../components/PdfCatalogModal';
 
 export default function AdminPage({
@@ -389,26 +402,129 @@ export default function AdminPage({
     return categories || initialCategories;
   });
 
-  const [newCatName, setNewCatName] = useState('');
-  const [newCatId, setNewCatId] = useState('');
+  const [editingCatId, setEditingCatId] = useState(null);
+  const [catOptimizing, setCatOptimizing] = useState(false);
+  const [catOptStats, setCatOptStats] = useState(null);
+  const [catFormData, setCatFormData] = useState({
+    id: '',
+    name: '',
+    desc: '',
+    badge: '',
+    image: '/images/mattress-tape-color.jpg',
+    icon: 'Layers',
+    inMenu: true
+  });
 
-  const handleAddCategory = (e) => {
+  const presetCategoryImages = [
+    { label: 'Fitil & Kenar Biyesi', url: '/images/mattress-tape-color.jpg' },
+    { label: 'Keçe & Tela', url: '/images/felt-color.jpg' },
+    { label: 'Ambalaj & Film', url: '/images/pe-film-color.jpg' },
+    { label: 'Tutkal & Hotmelt', url: '/images/hotmelts-thumb.jpg' },
+    { label: 'Zımba Teli & Donanım', url: '/images/staples-color.jpg' },
+    { label: 'Kulplar & Kapsüller', url: '/images/handles-color.jpg' },
+    { label: 'Karton Köşebent', url: '/images/cardboard-color.jpg' },
+    { label: 'Lojistik & Konteyner', url: '/images/slider-logistics.jpg' }
+  ];
+
+  const handleStartAddCategory = () => {
+    setEditingCatId('new');
+    setCatOptStats(null);
+    setCatOptimizing(false);
+    setCatFormData({
+      id: '',
+      name: '',
+      desc: '',
+      badge: '',
+      image: '/images/mattress-tape-color.jpg',
+      icon: 'Layers',
+      inMenu: true
+    });
+  };
+
+  const handleStartEditCategory = (cat) => {
+    setEditingCatId(cat.id);
+    setCatOptStats(null);
+    setCatOptimizing(false);
+    setCatFormData({
+      id: cat.id,
+      name: cat.name || '',
+      desc: cat.desc || '',
+      badge: cat.badge || '',
+      image: cat.image || '/images/mattress-tape-color.jpg',
+      icon: cat.icon || 'Layers',
+      inMenu: cat.inMenu !== false
+    });
+  };
+
+  const handleSaveCategory = (e) => {
     e.preventDefault();
-    if (!newCatName.trim()) return;
-    const id = newCatId.trim() || newCatName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    if (catList.some(c => c.id === id)) {
-      alert('Bu ID ile zaten bir kategori mevcut!');
+    if (!catFormData.name.trim()) {
+      alert('Lütfen kategori adını girin!');
       return;
     }
-    const updated = [...catList, { id, name: newCatName.trim(), icon: 'Layers' }];
+
+    if (editingCatId === 'new') {
+      const id = catFormData.id.trim() || catFormData.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      if (catList.some(c => c.id === id)) {
+        alert('Bu ID ile zaten bir kategori mevcut!');
+        return;
+      }
+      const newCat = {
+        ...catFormData,
+        id,
+        name: catFormData.name.trim(),
+        desc: catFormData.desc.trim(),
+        badge: catFormData.badge.trim(),
+        image: catFormData.image.trim(),
+        inMenu: catFormData.inMenu
+      };
+      const updated = [...catList, newCat];
+      setCatList(updated);
+      if (setCategories) setCategories(updated);
+      try {
+        localStorage.setItem('makemattress_custom_categories', JSON.stringify(updated));
+      } catch (err) {}
+      setEditingCatId(null);
+      showToast(`"${newCat.name}" kategorisi başarıyla eklendi.`);
+    } else {
+      // Editing existing category
+      const updated = catList.map(c => {
+        if (c.id === editingCatId) {
+          return {
+            ...c,
+            name: catFormData.name.trim(),
+            desc: catFormData.desc.trim(),
+            badge: catFormData.badge.trim(),
+            image: catFormData.image.trim(),
+            icon: catFormData.icon || c.icon,
+            inMenu: catFormData.inMenu
+          };
+        }
+        return c;
+      });
+      setCatList(updated);
+      if (setCategories) setCategories(updated);
+      try {
+        localStorage.setItem('makemattress_custom_categories', JSON.stringify(updated));
+      } catch (err) {}
+      setEditingCatId(null);
+      showToast(`"${catFormData.name}" kategorisi güncellendi.`);
+    }
+  };
+
+  const handleToggleCategoryMenu = (catId) => {
+    const updated = catList.map(c => {
+      if (c.id === catId) {
+        return { ...c, inMenu: c.inMenu === false ? true : false };
+      }
+      return c;
+    });
     setCatList(updated);
     if (setCategories) setCategories(updated);
     try {
       localStorage.setItem('makemattress_custom_categories', JSON.stringify(updated));
-    } catch (e) {}
-    setNewCatName('');
-    setNewCatId('');
-    showToast(`"${newCatName}" kategorisi eklendi.`);
+    } catch (err) {}
+    showToast('Menü görünürlüğü güncellendi.');
   };
 
   const handleDeleteCategory = (catId) => {
@@ -423,16 +539,55 @@ export default function AdminPage({
     try {
       localStorage.setItem('makemattress_custom_categories', JSON.stringify(updated));
     } catch (e) {}
+    if (editingCatId === catId) setEditingCatId(null);
     showToast('Kategori silindi.');
   };
 
-  // PDF Catalog Management State
+  const handleResetCategoriesToDefault = () => {
+    if (!window.confirm('Tüm kategorileri ve mega menü ayarlarını varsayılana sıfırlamak istediğinize emin misiniz?')) return;
+    setCatList(initialCategories);
+    if (setCategories) setCategories(initialCategories);
+    try {
+      localStorage.removeItem('makemattress_custom_categories');
+    } catch (e) {}
+    setEditingCatId(null);
+    showToast('Kategoriler varsayılana sıfırlandı.');
+  };
+
+  const handleCategoryImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setCatOptimizing(true);
+      setCatOptStats(null);
+      const res = await optimizeImageToWebP(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
+      setCatFormData(prev => ({ ...prev, image: res.dataUrl }));
+      setCatOptStats({
+        original: res.originalSizeFormatted,
+        optimized: res.optimizedSizeFormatted,
+        savings: res.savingsPercent,
+        format: res.format,
+        dims: `${res.width}x${res.height}`
+      });
+      showToast(`Görsel WebP formatına optimize edildi: ${res.originalSizeFormatted} → ${res.optimizedSizeFormatted} (%${res.savingsPercent} tasarruf)`);
+    } catch (err) {
+      alert(`Görsel optimize edilirken hata oluştu: ${err.message}`);
+    } finally {
+      setCatOptimizing(false);
+      e.target.value = '';
+    }
+  };
+
+  // PDF Catalog Management State with IndexedDB & Local Server Disk Write
   const [isPreviewingPdf, setIsPreviewingPdf] = useState(false);
   const [customPdfUrl, setCustomPdfUrl] = useState(catalogPdf);
   const [uploadedFileName, setUploadedFileName] = useState('');
   const [uploadSuccessMsg, setUploadSuccessMsg] = useState('');
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const [pdfMeta, setPdfMeta] = useState(() => getCatalogMetadata());
 
-  const handlePdfFileUpload = (e) => {
+  const handlePdfFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -441,18 +596,55 @@ export default function AdminPage({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      if (setCatalogPdf) setCatalogPdf(dataUrl);
-      try {
-        localStorage.setItem('makemattress_catalog_pdf', dataUrl);
-      } catch (err) {}
-      setUploadedFileName(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
-      setUploadSuccessMsg(`✓ "${file.name}" başarıyla yüklendi ve canlı katalog olarak yayınlandı!`);
-      setTimeout(() => setUploadSuccessMsg(''), 6000);
-    };
-    reader.readAsDataURL(file);
+    try {
+      setIsUploadingPdf(true);
+      setUploadSuccessMsg('');
+
+      // 1. Local Vite dev server: overwrite public/catalog/makemattress-catalog-2026.pdf directly on disk!
+      const serverResult = await uploadPdfToLocalServer(file);
+
+      // 2. Browser storage: persist to IndexedDB (survives refreshes, no 5MB limit!)
+      await savePdfToIndexedDB(file, file.name);
+
+      // 3. Create active Object URL for instant previewing & set as active catalog
+      const objectUrl = URL.createObjectURL(file);
+      if (setCatalogPdf) setCatalogPdf(objectUrl);
+
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      const newMeta = {
+        filename: file.name,
+        size: file.size,
+        sizeFormatted: `${sizeMb} MB`,
+        updatedAt: Date.now(),
+        serverSaved: serverResult.serverSaved
+      };
+      setPdfMeta(newMeta);
+      setUploadedFileName(`${file.name} (${sizeMb} MB)`);
+
+      if (serverResult.serverSaved) {
+        setUploadSuccessMsg(`✓ "${file.name}" yüklendi! Proje diskine (public/catalog/) kalıcı olarak yazıldı ve yayına alındı.`);
+      } else {
+        setUploadSuccessMsg(`✓ "${file.name}" yüklendi! Tarayıcı kalıcı hafızasına (IndexedDB) kaydedildi ve yayına alındı.`);
+      }
+      showToast(`Yeni PDF katalog yüklendi (${sizeMb} MB).`);
+    } catch (err) {
+      console.error('PDF yükleme hatası:', err);
+      alert(`PDF yüklenirken bir hata oluştu: ${err.message}`);
+    } finally {
+      setIsUploadingPdf(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleResetPdfToDefault = async () => {
+    if (!window.confirm('Özel yüklenen PDF kataloğu kaldırıp sistem varsayılanına dönmek istediğinize emin misiniz?')) return;
+    await clearPdfFromIndexedDB();
+    if (setCatalogPdf) setCatalogPdf(DEFAULT_CATALOG_PATH);
+    setPdfMeta(null);
+    setUploadedFileName('');
+    setCustomPdfUrl(DEFAULT_CATALOG_PATH);
+    setUploadSuccessMsg('Katalog varsayılan fabrika ayarına sıfırlandı.');
+    showToast('Katalog varsayılana sıfırlandı.');
   };
 
   const handleSaveCustomUrl = (e) => {
@@ -463,12 +655,40 @@ export default function AdminPage({
       localStorage.setItem('makemattress_catalog_pdf', customPdfUrl.trim());
     } catch (e) {}
     setUploadSuccessMsg(`✓ Katalog adresi "${customPdfUrl.trim()}" olarak güncellendi ve yayına alındı!`);
+    showToast('Katalog URL bağlantısı güncellendi.');
     setTimeout(() => setUploadSuccessMsg(''), 6000);
   };
 
   // Product edit modal form
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [productForm, setProductForm] = useState(null);
+  const [productOptimizing, setProductOptimizing] = useState(false);
+  const [productOptStats, setProductOptStats] = useState(null);
+
+  const handleProductImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setProductOptimizing(true);
+      setProductOptStats(null);
+      const res = await optimizeImageToWebP(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
+      setProductForm(prev => ({ ...prev, thumb: res.dataUrl }));
+      setProductOptStats({
+        original: res.originalSizeFormatted,
+        optimized: res.optimizedSizeFormatted,
+        savings: res.savingsPercent,
+        format: res.format,
+        dims: `${res.width}x${res.height}`
+      });
+      showToast(`Ürün görseli WebP formatına optimize edildi: ${res.originalSizeFormatted} → ${res.optimizedSizeFormatted} (%${res.savingsPercent} tasarruf)`);
+    } catch (err) {
+      alert(`Ürün görseli optimize edilirken hata oluştu: ${err.message}`);
+    } finally {
+      setProductOptimizing(false);
+      e.target.value = '';
+    }
+  };
 
   const handleSaveProduct = (e) => {
     e.preventDefault();
@@ -573,7 +793,7 @@ export default function AdminPage({
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-amber-500 text-stone-950 text-xs font-bold shadow-2xl flex items-center gap-2 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-amber-500 text-stone-950 text-xs font-bold shadow-2xl flex items-center gap-2 animate-fade-in transition-all">
           <Check className="w-4 h-4" />
           <span>{toastMessage}</span>
         </div>
@@ -765,6 +985,8 @@ export default function AdminPage({
                         inStock: true,
                         translations: { tr: {}, de: {}, es: {}, ru: {}, ar: {}, zh: {} }
                       });
+                      setProductOptStats(null);
+                      setProductOptimizing(false);
                       setIsEditingProduct(true);
                     }}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition-all shadow-md cursor-pointer"
@@ -952,6 +1174,8 @@ export default function AdminPage({
                             <button
                               onClick={() => {
                                 setProductForm(product);
+                                setProductOptStats(null);
+                                setProductOptimizing(false);
                                 setIsEditingProduct(true);
                               }}
                               className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-stone-300 transition-colors cursor-pointer"
@@ -977,87 +1201,369 @@ export default function AdminPage({
           )}
 
           {/* ============================================================== */}
-          {/* TAB 2: CATEGORY MANAGEMENT (Yeni İstek)                        */}
+          {/* TAB 2: CATEGORY & MEGA MENU MANAGEMENT                         */}
           {/* ============================================================== */}
           {activeTab === 'categories' && (
-            <div className="space-y-6 max-w-4xl mx-auto">
-              <div className="flex items-center justify-between">
+            <div className="space-y-6 max-w-5xl mx-auto">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <h1 className="text-xl font-bold text-white">Kategori Yönetimi</h1>
-                  <p className="text-xs text-stone-400">
-                    Sitedeki ürün filtreleri ve navbar dropdown menüsünde görünen kategorileri ekleyin veya düzenleyin.
+                  <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                    <LayoutGrid className="w-5 h-5 text-amber-500" />
+                    <span>Kategori & Mega Menü Yönetimi</span>
+                  </h1>
+                  <p className="text-xs text-stone-400 mt-0.5">
+                    Navbar geniş mega dropdown menüsünde, ürün filtrelerinde ve katalogda görünen kategorileri, görselleri ve rozetleri düzenleyin.
                   </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetCategoriesToDefault}
+                    className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-stone-400 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Orijinal fabrika kategorilerine sıfırla"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Varsayılana Dön</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleStartAddCategory}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Yeni Kategori Ekle</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Add Category Form */}
-              <form onSubmit={handleAddCategory} className="p-5 rounded-2xl bg-[#141418] border border-white/10 space-y-4">
-                <h3 className="text-sm font-bold text-white">Yeni Kategori Ekle</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-300 mb-1">Kategori Adı</label>
-                    <input
-                      type="text"
-                      value={newCatName}
-                      onChange={(e) => setNewCatName(e.target.value)}
-                      placeholder="Örn: Yatak Yayları & Teller"
-                      className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500"
-                    />
+              {/* Add / Edit Category Form Panel */}
+              {editingCatId && (
+                <form onSubmit={handleSaveCategory} className="p-6 rounded-2xl bg-[#141418] border border-amber-500/40 shadow-xl space-y-4 animate-fade-in relative overflow-hidden">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 flex items-center justify-center">
+                        {editingCatId === 'new' ? <Plus className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+                      </div>
+                      <h3 className="text-sm font-bold text-white">
+                        {editingCatId === 'new' ? 'Yeni Kategori Oluştur' : `Kategoriyi Düzenle: ${catFormData.name || editingCatId}`}
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingCatId(null)}
+                      className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                    >
+                      ✕
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-300 mb-1">Kategori ID / Slug (Opsiyonel)</label>
-                    <input
-                      type="text"
-                      value={newCatId}
-                      onChange={(e) => setNewCatId(e.target.value)}
-                      placeholder="Örn: springs-wire"
-                      className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
-                >
-                  Kategori Kaydet
-                </button>
-              </form>
 
-              {/* Category List */}
-              <div className="rounded-2xl border border-white/10 bg-[#141418] overflow-hidden">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-300 mb-1">Kategori Adı *</label>
+                      <input
+                        type="text"
+                        value={catFormData.name}
+                        onChange={(e) => setCatFormData({ ...catFormData, name: e.target.value })}
+                        placeholder="Örn: Yatak Fitilleri & Şeritler"
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-300 mb-1">
+                        Kategori ID / Slug
+                        {editingCatId !== 'new' && <span className="text-[10px] text-stone-500 ml-1.5">(Sabit ID)</span>}
+                      </label>
+                      <input
+                        type="text"
+                        value={catFormData.id}
+                        disabled={editingCatId !== 'new'}
+                        onChange={(e) => setCatFormData({ ...catFormData, id: e.target.value })}
+                        placeholder="Örn: tapes (otomatik oluşturulur)"
+                        className={`w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 font-mono ${
+                          editingCatId !== 'new' ? 'opacity-60 cursor-not-allowed' : ''
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-300 mb-1">Katalog Rozeti (Badge)</label>
+                      <input
+                        type="text"
+                        value={catFormData.badge}
+                        onChange={(e) => setCatFormData({ ...catFormData, badge: e.target.value })}
+                        placeholder="Örn: 100+ Desen, Yeni, Zero MOQ"
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-stone-300 mb-1">Alt Başlık / Kısa Açıklama (Mega Menüde Görünen)</label>
+                      <input
+                        type="text"
+                        value={catFormData.desc}
+                        onChange={(e) => setCatFormData({ ...catFormData, desc: e.target.value })}
+                        placeholder="Örn: Özel jakar dokuma kenar biyesi, fitiller, nakışlı kulplar..."
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-300 mb-1">İkon Seçimi</label>
+                      <select
+                        value={catFormData.icon}
+                        onChange={(e) => setCatFormData({ ...catFormData, icon: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white focus:outline-none focus:border-amber-500 cursor-pointer"
+                      >
+                        <option value="Ribbon">Ribbon (Şerit / Fitil)</option>
+                        <option value="Sparkles">Sparkles (Kumaş / Keçe / Lüks)</option>
+                        <option value="Package">Package (Ambalaj / PE Film)</option>
+                        <option value="FlaskConical">FlaskConical (Tutkal / Kimyasal)</option>
+                        <option value="Boxes">Boxes (Yay / Zımba / Metal)</option>
+                        <option value="Layers">Layers (Genel / Tüm Bileşenler)</option>
+                      </select>
+                    </div>
+
+                    {/* Image URL & File Upload with Automatic WebP Optimization */}
+                    <div className="sm:col-span-3 space-y-2 p-3.5 rounded-2xl bg-black/30 border border-white/10">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-semibold text-stone-300">Mega Menü Görseli *</label>
+                        <label className={`text-xs flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                          catOptimizing
+                            ? 'bg-amber-500/20 text-amber-300 cursor-wait'
+                            : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/30'
+                        }`}>
+                          {catOptimizing ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>WebP Dönüştürülüyor...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>Bilgisayardan Yükle (Otomatik WebP)</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={catOptimizing}
+                            onChange={handleCategoryImageUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      {/* WebP Optimization Result Banner */}
+                      {catOptStats && (
+                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] animate-fade-in">
+                          <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <div className="flex-1">
+                            <span className="font-bold">⚡ Otomatik WebP Optimizasyonu: </span>
+                            <span>{catOptStats.original} → {catOptStats.optimized} </span>
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold ml-1">
+                              %{catOptStats.savings} Tasarruf
+                            </span>
+                            <span className="text-emerald-400/70 ml-1">({catOptStats.dims})</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row items-center gap-3">
+                        {/* Live Image Preview */}
+                        <div className="w-20 h-16 rounded-xl overflow-hidden bg-stone-900 border border-white/20 shrink-0 relative">
+                          <img
+                            src={catFormData.image || '/images/slider-logistics.jpg'}
+                            alt="Önizleme"
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.target.src = '/images/slider-logistics.jpg'; }}
+                          />
+                          {(catFormData.image?.startsWith('data:image/webp') || catOptStats) && (
+                            <span className="absolute bottom-1 right-1 px-1 py-0.2 rounded bg-emerald-500 text-stone-950 font-black text-[8px] uppercase tracking-wider">
+                              WEBP
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex-1 w-full">
+                          <input
+                            type="text"
+                            value={catFormData.image}
+                            onChange={(e) => {
+                              setCatFormData({ ...catFormData, image: e.target.value });
+                              setCatOptStats(null);
+                            }}
+                            placeholder="/images/mattress-tape-color.jpg veya https://..."
+                            className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 font-mono"
+                            required
+                          />
+                          <p className="text-[10px] text-stone-400 mt-1">
+                            Dosya seçtiğinizde tarayıcınız görseli otomatik olarak sıkıştırıp yüksek verimli <strong>WebP</strong> formatına çevirir.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Quick Preset Selector */}
+                      <div className="pt-1 border-t border-white/5">
+                        <p className="text-[10.5px] text-stone-400 mb-1.5">Hızlı Hazır Görseller:</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {presetCategoryImages.map((preset, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                setCatFormData({ ...catFormData, image: preset.url });
+                                setCatOptStats(null);
+                              }}
+                              className={`px-2 py-1 rounded-lg text-[10.5px] transition-colors cursor-pointer border ${
+                                catFormData.image === preset.url
+                                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold'
+                                  : 'bg-white/5 hover:bg-white/10 text-stone-300 border-white/5'
+                              }`}
+                            >
+                              {preset.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mega Menu Toggle */}
+                    <div className="sm:col-span-3 flex items-center justify-between p-3 rounded-xl bg-black/30 border border-white/10">
+                      <div>
+                        <p className="text-xs font-bold text-white">Mega Menüde Görüntülensin</p>
+                        <p className="text-[11px] text-stone-400">Aktif olduğunda navbar'daki "Ürünler" açılır mega menüsünde kartı yer alır.</p>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={catFormData.inMenu}
+                        onClick={() => setCatFormData({ ...catFormData, inMenu: !catFormData.inMenu })}
+                        className={`w-12 h-6.5 rounded-full p-0.5 transition-colors cursor-pointer flex items-center ${
+                          catFormData.inMenu ? 'bg-amber-500' : 'bg-stone-700'
+                        }`}
+                      >
+                        <div
+                          className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transition-transform ${
+                            catFormData.inMenu ? 'translate-x-5.5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setEditingCatId(null)}
+                      className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      İptal
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md active:scale-95"
+                    >
+                      {editingCatId === 'new' ? 'Kategoriyi Oluştur' : 'Değişiklikleri Kaydet'}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Category List Cards & Table */}
+              <div className="rounded-2xl border border-white/10 bg-[#141418] overflow-hidden shadow-lg">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-black/40 border-b border-white/10 text-stone-400 uppercase font-medium">
                     <tr>
-                      <th className="py-3 px-4">Kategori Adı</th>
+                      <th className="py-3 px-4">Görsel & Kategori</th>
                       <th className="py-3 px-4">ID / Slug</th>
-                      <th className="py-3 px-4">Bağlı Ürün Sayısı</th>
+                      <th className="py-3 px-4">Mega Menü</th>
+                      <th className="py-3 px-4">Ürün Sayısı</th>
                       <th className="py-3 px-4 text-right">İşlemler</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {catList.map(cat => {
-                      const count = products.filter(p => p.category === cat.id).length;
+                      const count = products.filter(p => cat.id === 'all' || p.category === cat.id).length;
+                      const isMenuVisible = cat.inMenu !== false;
+                      const imgSrc = cat.image || presetCategoryImages[0].url;
+
                       return (
-                        <tr key={cat.id} className="hover:bg-white/[0.02]">
-                          <td className="py-3 px-4 font-semibold text-white">
-                            {cat.name}
+                        <tr key={cat.id} className="hover:bg-white/[0.02] transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-9 rounded-lg overflow-hidden bg-stone-900 border border-white/15 shrink-0">
+                                <img
+                                  src={imgSrc}
+                                  alt={cat.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { e.target.src = '/images/slider-logistics.jpg'; }}
+                                />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-bold text-white text-xs">{cat.name}</span>
+                                  {cat.badge && (
+                                    <span className="px-1.5 py-0.2 rounded-md bg-amber-500/15 text-amber-400 text-[9px] font-semibold uppercase">
+                                      {cat.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                {cat.desc && (
+                                  <p className="text-[11px] text-stone-400 line-clamp-1 max-w-sm font-light mt-0.5">
+                                    {cat.desc}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </td>
+
                           <td className="py-3 px-4 font-mono text-stone-400">
-                            {cat.id}
+                            <span className="px-2 py-1 rounded bg-black/40 border border-white/5 text-[11px]">
+                              {cat.id}
+                            </span>
                           </td>
-                          <td className="py-3 px-4 text-stone-300">
+
+                          <td className="py-3 px-4">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleCategoryMenu(cat.id)}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors cursor-pointer ${
+                                isMenuVisible
+                                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                  : 'bg-stone-800 text-stone-400 border border-white/5'
+                              }`}
+                              title="Tıklayarak menüde göster / gizle"
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full ${isMenuVisible ? 'bg-emerald-400 animate-pulse' : 'bg-stone-500'}`} />
+                              <span>{isMenuVisible ? 'Menüde Aktif' : 'Gizli'}</span>
+                            </button>
+                          </td>
+
+                          <td className="py-3 px-4 text-stone-300 font-mono">
                             {count} ürün
                           </td>
+
                           <td className="py-3 px-4 text-right">
-                            {cat.id !== 'all' && (
+                            <div className="flex items-center justify-end gap-1.5">
                               <button
-                                onClick={() => handleDeleteCategory(cat.id)}
-                                className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 cursor-pointer"
-                                title="Kategoriyi Sil"
+                                onClick={() => handleStartEditCategory(cat)}
+                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white transition-colors cursor-pointer"
+                                title="Kategoriyi Düzenle"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Edit2 className="w-3.5 h-3.5" />
                               </button>
-                            )}
+                              {cat.id !== 'all' && (
+                                <button
+                                  onClick={() => handleDeleteCategory(cat.id)}
+                                  className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors cursor-pointer"
+                                  title="Kategoriyi Sil"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1123,71 +1629,165 @@ export default function AdminPage({
                 </div>
               )}
 
-              <div className="p-6 rounded-2xl bg-[#141418] border border-white/10 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="p-6 rounded-2xl bg-[#141418] border border-white/10 space-y-6 shadow-xl">
+                {/* 1. Active Catalog Header & Status */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center">
-                      <BookOpen className="w-5 h-5" />
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+                      <BookOpen className="w-6 h-6" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="text-sm font-bold text-white">Aktif Yayındaki Katalog</h3>
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
-                          Yayında
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                          <span>Canlıda Aktif</span>
                         </span>
+                        {pdfMeta && (
+                          <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-bold border border-blue-500/30">
+                            Özel Dosya
+                          </span>
+                        )}
                       </div>
-                      <p className="text-xs text-stone-400 mt-0.5 font-mono truncate max-w-md">
-                        {catalogPdf.startsWith('data:')
-                          ? `Özel Yüklenen PDF Dosyası ${uploadedFileName ? `• ${uploadedFileName}` : ''}`
-                          : catalogPdf}
+                      <p className="text-xs text-stone-300 mt-1 font-mono truncate max-w-lg">
+                        {pdfMeta?.filename 
+                          ? `${pdfMeta.filename} (${pdfMeta.sizeFormatted || (pdfMeta.size ? (pdfMeta.size / (1024 * 1024)).toFixed(2) + ' MB' : '')})`
+                          : (catalogPdf.startsWith('blob:') || catalogPdf.startsWith('data:') 
+                              ? `Özel Yüklenen Katalog PDF ${uploadedFileName ? `• ${uploadedFileName}` : ''}`
+                              : catalogPdf)}
                       </p>
+                      {pdfMeta?.updatedAt && (
+                        <p className="text-[10px] text-stone-500 mt-0.5">
+                          Son Güncelleme: {new Date(pdfMeta.updatedAt).toLocaleString('tr-TR')}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  {/* Actions Bar */}
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => setIsPreviewingPdf(true)}
                       className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all cursor-pointer shadow-xs"
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      <span>3D Önizle</span>
+                      <span>3D FlipBook Önizle</span>
                     </button>
                     <a
                       href={catalogPdf}
                       target="_blank"
                       rel="noopener noreferrer"
-                      download="makemattress-catalog.pdf"
-                      className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-stone-300 transition-colors"
+                      download={pdfMeta?.filename || "makemattress-catalog-2026.pdf"}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-stone-300 text-xs font-semibold transition-colors"
                       title="PDF'i İndir / Aç"
                     >
-                      <Download className="w-4 h-4" />
+                      <Download className="w-3.5 h-3.5" />
+                      <span>İndir</span>
                     </a>
+                    {(pdfMeta || catalogPdf !== DEFAULT_CATALOG_PATH) && (
+                      <button
+                        onClick={handleResetPdfToDefault}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 text-xs font-semibold transition-colors cursor-pointer"
+                        title="Varsayılan Fabrika Kataloğuna Dön"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Sıfırla</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                <div className="pt-2 space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                    Bilgisayarınızdan Yeni PDF Dosyası Yükleyin
-                  </h4>
-                  <div className="mt-2 flex items-center justify-center p-6 border-2 border-dashed border-stone-700 hover:border-amber-500/60 rounded-2xl bg-black/30 transition-colors">
-                    <label className="flex flex-col items-center gap-2 cursor-pointer text-center">
-                      <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-amber-400">
-                        <Upload className="w-5 h-5" />
-                      </div>
-                      <span className="text-xs font-semibold text-white">
-                        PDF Dosyasını Seçmek İçin Tıklayın
-                      </span>
-                      <span className="text-[11px] text-stone-500">
-                        Maksimum 50 MB • .pdf formatı desteklenir
-                      </span>
+                {/* 2. Direct Computer File Upload (IndexedDB + Disk Persistence) */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                      1. Bilgisayarınızdan Yeni PDF Dosyası Yükleyin
+                    </h4>
+                    <span className="text-[11px] text-stone-400 font-medium">
+                      50 MB+ Boyut Desteği • Kalıcı Hafıza
+                    </span>
+                  </div>
+
+                  <div className={`flex items-center justify-center p-8 border-2 border-dashed rounded-2xl bg-black/40 transition-colors ${
+                    isUploadingPdf ? 'border-amber-500/60 bg-amber-500/5' : 'border-stone-700 hover:border-amber-500/60'
+                  }`}>
+                    <label className={`flex flex-col items-center gap-2.5 text-center ${isUploadingPdf ? 'cursor-wait' : 'cursor-pointer'}`}>
+                      {isUploadingPdf ? (
+                        <>
+                          <Loader2 className="w-10 h-10 text-amber-400 animate-spin" />
+                          <span className="text-sm font-bold text-white">
+                            PDF Dosyası İşleniyor ve Kalıcı Olarak Diske Yazılıyor...
+                          </span>
+                          <span className="text-xs text-stone-400">
+                            Lütfen bekleyin, dosya boyutuna göre birkaç saniye sürebilir.
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform shadow-inner">
+                            <Upload className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <span className="text-sm font-bold text-white block">
+                              Yeni PDF Kataloğu Seçmek İçin Tıklayın
+                            </span>
+                            <span className="text-xs text-stone-400 mt-1 block">
+                              Seçtiğiniz dosya hem proje diskinize hem tarayıcı kalıcı hafızasına kaydedilir.
+                            </span>
+                          </div>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-800 border border-white/10 text-[11px] text-stone-400">
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span>Maksimum 50+ MB • .pdf formatı</span>
+                          </span>
+                        </>
+                      )}
                       <input
                         type="file"
                         accept="application/pdf,.pdf"
+                        disabled={isUploadingPdf}
                         onChange={handlePdfFileUpload}
                         className="hidden"
                       />
                     </label>
                   </div>
+                </div>
+
+                {/* 3. External Custom URL Input (Optional) */}
+                <div className="pt-4 border-t border-white/10 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                    2. Veya Harici Katalog Linki (CDN / Google Drive / S3)
+                  </h4>
+                  <form onSubmit={handleSaveCustomUrl} className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={customPdfUrl}
+                      onChange={(e) => setCustomPdfUrl(e.target.value)}
+                      placeholder="https://cdn.domain.com/katalog-2026.pdf veya /catalog/..."
+                      className="flex-1 px-4 py-2.5 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 font-mono"
+                    />
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-colors cursor-pointer shrink-0"
+                    >
+                      Linki Kaydet & Yayına Al
+                    </button>
+                  </form>
+                </div>
+
+                {/* 4. Permanent Deployment Explanation Guide */}
+                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-2 text-xs">
+                  <div className="flex items-center gap-2 font-bold text-amber-300">
+                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Kalıcı Canlı Yayınlama ve Sıfırlanmama Garantisi:</span>
+                  </div>
+                  <ul className="text-stone-300 space-y-1.5 pl-6 list-disc text-[11.5px] leading-relaxed">
+                    <li>
+                      <strong>Fiziksel Dosya Değişimi:</strong> Lokal ortamda yüklediğiniz dosya doğrudan bilgisayarınızdaki <code className="text-amber-300 font-mono">public/catalog/makemattress-catalog-2026.pdf</code> dosyasının üzerine yazılır. Bu sayede sayfa yenilense de, tarayıcı kapansa da asla eski haline geri dönmez.
+                    </li>
+                    <li>
+                      <strong>Canlı Yayına Aktarma:</strong> Lokalden test ettikten sonra bana <strong>"canlıyı güncelle"</strong> demeniz yeterlidir; yeni PDF'iniz Cloudflare CDN üzerinden tüm dünyaya kalıcı olarak yayınlanır.
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -1216,12 +1816,13 @@ export default function AdminPage({
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
                   <button
                     onClick={() => {
                       if (window.confirm('Tüm özel ürün ve kategori cache verilerini sıfırlayıp fabrika ayarlarına dönmek istiyor musunuz?')) {
                         localStorage.removeItem('makemattress_custom_products');
                         localStorage.removeItem('makemattress_custom_categories');
+                        localStorage.removeItem('makemattress_container');
                         window.location.reload();
                       }
                     }}
@@ -1229,6 +1830,18 @@ export default function AdminPage({
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Önbelleği Sıfırla (Fabrika Ayarlarına Dön)</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('makemattress_lang_decision');
+                      sessionStorage.removeItem('makemattress_lang_dismissed');
+                      showToast('Dil önerisi bildirim hafızası sıfırlandı. Anasayfaya geçince 3 sn sonra tekrar görünecektir.');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-semibold text-xs flex items-center gap-2 cursor-pointer"
+                  >
+                    <Globe2 className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Dil Önerisi Hafızasını Sıfırla (Test Et)</span>
                   </button>
                 </div>
               </div>
@@ -1327,14 +1940,108 @@ export default function AdminPage({
                 </select>
               </div>
 
-              <div>
-                <label className="block text-stone-300 font-semibold mb-1">Görsel URL</label>
-                <input
-                  type="text"
-                  value={productForm.thumb}
-                  onChange={(e) => setProductForm({ ...productForm, thumb: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-white focus:outline-none focus:border-amber-500"
-                />
+              {/* Product Image Upload with Automatic WebP Optimization */}
+              <div className="space-y-2 p-3.5 rounded-2xl bg-black/30 border border-white/10">
+                <div className="flex items-center justify-between">
+                  <label className="block text-stone-200 font-semibold">Ürün Görseli *</label>
+                  
+                  <label className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
+                    productOptimizing 
+                      ? 'bg-amber-500/20 text-amber-300 cursor-wait' 
+                      : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/30'
+                  }`}>
+                    {productOptimizing ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>WebP Dönüştürülüyor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Bilgisayardan Yükle (Otomatik WebP)</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={productOptimizing}
+                      onChange={handleProductImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {/* WebP Optimization Result Banner */}
+                {productOptStats && (
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] animate-fade-in">
+                    <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div className="flex-1">
+                      <span className="font-bold">⚡ Otomatik WebP Optimizasyonu: </span>
+                      <span>{productOptStats.original} → {productOptStats.optimized} </span>
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold ml-1">
+                        %{productOptStats.savings} Tasarruf
+                      </span>
+                      <span className="text-emerald-400/70 ml-1">({productOptStats.dims})</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Image Preview & URL Input */}
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <div className="w-20 h-16 rounded-xl overflow-hidden bg-stone-900 border border-white/20 shrink-0 relative">
+                    <img
+                      src={productForm.thumb || '/images/mattress-tape-color.jpg'}
+                      alt={productForm.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.target.src = '/images/slider-logistics.jpg'; }}
+                    />
+                    {(productForm.thumb?.startsWith('data:image/webp') || productOptStats) && (
+                      <span className="absolute bottom-1 right-1 px-1 py-0.2 rounded bg-emerald-500 text-stone-950 font-black text-[8px] uppercase tracking-wider">
+                        WEBP
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex-1 w-full">
+                    <input
+                      type="text"
+                      value={productForm.thumb}
+                      onChange={(e) => {
+                        setProductForm({ ...productForm, thumb: e.target.value });
+                        setProductOptStats(null);
+                      }}
+                      placeholder="/images/mattress-tape-color.jpg veya https://..."
+                      className="w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 font-mono"
+                    />
+                    <p className="text-[10px] text-stone-400 mt-1">
+                      Dosya seçtiğinizde tarayıcınız görseli otomatik olarak sıkıştırıp yüksek verimli <strong>WebP</strong> formatına çevirir.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Quick Presets for Product */}
+                <div className="pt-1 border-t border-white/5">
+                  <p className="text-[10.5px] text-stone-400 mb-1.5">Hızlı Hazır Görseller:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {presetCategoryImages.map((preset, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setProductForm({ ...productForm, thumb: preset.url });
+                          setProductOptStats(null);
+                        }}
+                        className={`px-2 py-1 rounded-lg text-[10px] transition-colors border cursor-pointer ${
+                          productForm.thumb === preset.url
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold'
+                            : 'bg-white/5 hover:bg-white/10 text-stone-300 border-white/5'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div>

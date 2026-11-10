@@ -6,13 +6,11 @@ import {
   Share2,
   FileText,
   MessageCircle,
-  Sparkles,
   ShieldCheck,
   Truck,
   CheckCircle2,
   ChevronRight,
-  Layers,
-  Eye
+  Layers
 } from 'lucide-react';
 import { getTranslation } from '../data/translations';
 import { companyData } from '../data/initialData';
@@ -71,10 +69,10 @@ export default function ProductDetailPage({
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto text-stone-900 dark:text-stone-100">
+    <div className="min-h-screen pt-22 pb-14 px-3 sm:px-5 lg:px-6 max-w-[1440px] mx-auto text-stone-900 dark:text-stone-100">
       
       {/* 1. Breadcrumbs & Top Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-8 text-xs text-stone-500 dark:text-stone-400">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 text-xs text-stone-500 dark:text-stone-400">
         <nav className="flex items-center gap-1.5 flex-wrap">
           <button
             onClick={onBack}
@@ -115,39 +113,24 @@ export default function ProductDetailPage({
         
         {/* Left Column: Image Gallery */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="relative aspect-4/3 rounded-3xl overflow-hidden bg-stone-100 dark:bg-stone-900 shadow-xl border border-stone-200/60 dark:border-white/10 group">
+          <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-900 border border-stone-200/80 dark:border-white/10">
             <img
               src={activeImage}
               alt={localizedName}
-              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+              className="w-full h-full object-cover object-center"
             />
-            
-            {/* Top Specular Line */}
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/50 dark:via-white/20 to-transparent"></div>
-
-            {/* Badges Overlay */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-              <span className="px-3.5 py-1 rounded-full backdrop-blur-xl bg-black/60 text-white text-[11px] font-bold uppercase tracking-wider border border-white/20">
-                {localizedCategoryName}
-              </span>
-              {product.featured && (
-                <span className="px-3 py-1 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white text-[10px] font-bold uppercase tracking-widest shadow-md">
-                  Export Grade
-                </span>
-              )}
-            </div>
           </div>
 
           {/* Thumbnails row if more than 1 image */}
           {allImages.length > 1 && (
-            <div className="flex items-center gap-3 overflow-x-auto pb-2 dropdown-scrollbar">
+            <div className="flex items-center gap-2.5 overflow-x-auto pb-2 dropdown-scrollbar">
               {allImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImage(img)}
-                  className={`w-20 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer shrink-0 ${
+                  className={`w-20 h-16 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer shrink-0 ${
                     activeImage === img
-                      ? 'border-amber-500 shadow-md scale-102'
+                      ? 'border-[#8C7A58] dark:border-[#D4B37F]'
                       : 'border-stone-200 dark:border-white/10 opacity-70 hover:opacity-100'
                   }`}
                 >
@@ -158,19 +141,19 @@ export default function ProductDetailPage({
           )}
 
           {/* Manufacturing Assurance Highlights */}
-          <div className="grid grid-cols-2 gap-3 pt-3">
-            <div className="p-3.5 rounded-2xl backdrop-blur-md bg-stone-100/70 dark:bg-white/[0.04] border border-stone-200/60 dark:border-white/06 flex items-center gap-3">
-              <ShieldCheck className="w-5 h-5 text-amber-500 shrink-0" />
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="p-3.5 rounded-xl bg-stone-100/80 dark:bg-white/[0.04] border border-stone-200/70 dark:border-white/[0.06] flex items-center gap-3">
+              <ShieldCheck className="w-5 h-5 text-[#8C7A58] dark:text-[#D4B37F] shrink-0" />
               <div>
-                <p className="text-[11px] font-bold text-stone-900 dark:text-stone-100">Kayseri Export QA</p>
-                <p className="text-[10px] text-stone-500 dark:text-stone-400">100% Pre-shipment audit</p>
+                <p className="text-xs font-semibold text-stone-900 dark:text-stone-100">Kayseri Export QA</p>
+                <p className="text-[11px] text-stone-500 dark:text-stone-400">100% Pre-shipment audit</p>
               </div>
             </div>
-            <div className="p-3.5 rounded-2xl backdrop-blur-md bg-stone-100/70 dark:bg-white/[0.04] border border-stone-200/60 dark:border-white/06 flex items-center gap-3">
-              <Truck className="w-5 h-5 text-amber-500 shrink-0" />
+            <div className="p-3.5 rounded-xl bg-stone-100/80 dark:bg-white/[0.04] border border-stone-200/70 dark:border-white/[0.06] flex items-center gap-3">
+              <Truck className="w-5 h-5 text-[#8C7A58] dark:text-[#D4B37F] shrink-0" />
               <div>
-                <p className="text-[11px] font-bold text-stone-900 dark:text-stone-100">Mixed Container Load</p>
-                <p className="text-[10px] text-stone-500 dark:text-stone-400">Zero MOQ consolidation</p>
+                <p className="text-xs font-semibold text-stone-900 dark:text-stone-100">Mixed Container Load</p>
+                <p className="text-[11px] text-stone-500 dark:text-stone-400">Zero MOQ consolidation</p>
               </div>
             </div>
           </div>
@@ -180,11 +163,10 @@ export default function ProductDetailPage({
         <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest border border-amber-500/20 mb-2">
-                <Sparkles className="w-3 h-3" />
-                <span>B2B Industrial Mattress Component</span>
-              </div>
-              <h1 className="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-white font-bold leading-tight">
+              <span className="inline-block text-xs font-semibold text-[#8C7A58] dark:text-[#D4B37F] mb-1">
+                {localizedCategoryName}
+              </span>
+              <h1 className="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-white font-semibold leading-tight">
                 {localizedName}
               </h1>
               <p className="text-sm sm:text-base text-stone-600 dark:text-stone-400 font-medium mt-1">
@@ -193,24 +175,24 @@ export default function ProductDetailPage({
             </div>
 
             {/* Description */}
-            <div className="p-4 sm:p-5 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-white/[0.03] border border-stone-200/70 dark:border-white/10 text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed">
+            <div className="p-4 sm:p-5 rounded-2xl bg-white/80 dark:bg-white/[0.03] border border-stone-200/70 dark:border-white/10 text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed">
               {localizedDesc}
             </div>
 
-            {/* Key Technical Specs Table */}
+            {/* Key Technical Specs Table (Flattened cleanly) */}
             {product.specs && (
-              <div className="space-y-2.5">
-                <h4 className="text-xs uppercase font-bold tracking-wider text-stone-500 dark:text-stone-400 flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Teknik Özellikler & Fabrika Standartları</span>
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div className="space-y-2">
+                <h2 className="text-xs uppercase font-bold tracking-wider text-stone-600 dark:text-stone-400 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-[#8C7A58] dark:text-[#D4B37F]" />
+                  <span>{t('spec_factory_specs')}</span>
+                </h2>
+                <div className="rounded-2xl border border-stone-200/80 dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.02] divide-y divide-stone-200/60 dark:divide-white/[0.06] text-xs">
                   {Object.entries(product.specs).map(([key, val], idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-xl backdrop-blur-md bg-stone-100/70 dark:bg-white/[0.04] border border-stone-200/60 dark:border-white/[0.06] flex items-center justify-between gap-2"
+                      className="px-4 py-2.5 flex items-center justify-between gap-2"
                     >
-                      <span className="text-[11px] text-stone-500 dark:text-stone-400 font-medium">
+                      <span className="text-stone-500 dark:text-stone-400 font-medium">
                         {key}
                       </span>
                       <span className="font-semibold text-stone-900 dark:text-stone-100 text-right">
@@ -224,16 +206,16 @@ export default function ProductDetailPage({
           </div>
 
           {/* Action Box: Quantity, Add to Container, WhatsApp Quote */}
-          <div className="p-5 sm:p-6 rounded-3xl backdrop-blur-2xl bg-white/80 dark:bg-[#121216]/90 border border-stone-200/80 dark:border-white/10 shadow-xl space-y-4">
+          <div className="p-5 sm:p-6 rounded-2xl bg-white/90 dark:bg-[#121216]/90 border border-stone-200/80 dark:border-white/10 shadow-xs space-y-4">
             
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
-                  Konsolide Yükleme (Consolidation)
+                  {t('drawer_header_title')}
                 </p>
-                <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Konteynere Eklemeye Uygun</span>
+                  <span>{t('moq_consolidated')}</span>
                 </p>
               </div>
 
@@ -270,12 +252,12 @@ export default function ProductDetailPage({
                 {isAdded ? (
                   <>
                     <Check className="w-4 h-4" />
-                    <span>Konteynerde Mevcut</span>
+                    <span>{t('in_container')}</span>
                   </>
                 ) : (
                   <>
                     <Box className="w-4 h-4" />
-                    <span>Konteynere Ekle</span>
+                    <span>{t('add_to_container')}</span>
                   </>
                 )}
               </button>
@@ -285,7 +267,7 @@ export default function ProductDetailPage({
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3.5 px-5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba59] text-white shadow-md transition-all cursor-pointer"
+                className="w-full py-3.5 px-5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white transition-colors cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>WhatsApp Fiyat İste</span>
@@ -296,9 +278,9 @@ export default function ProductDetailPage({
             {onOpenPdfCatalog && (
               <button
                 onClick={onOpenPdfCatalog}
-                className="w-full py-2.5 px-4 rounded-full backdrop-blur-md bg-stone-100 dark:bg-white/[0.05] hover:bg-stone-200 dark:hover:bg-white/10 text-stone-800 dark:text-stone-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-stone-200/60 dark:border-white/10"
+                className="w-full py-2.5 px-4 rounded-full bg-stone-100 dark:bg-white/[0.05] hover:bg-stone-200 dark:hover:bg-white/10 text-stone-800 dark:text-stone-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-stone-200/70 dark:border-white/10"
               >
-                <FileText className="w-3.5 h-3.5 text-amber-500" />
+                <FileText className="w-3.5 h-3.5 text-[#8C7A58] dark:text-[#D4B37F]" />
                 <span>3D Sayfalı PDF Kataloğu Aç ({t('pdf_catalog_button')})</span>
               </button>
             )}
@@ -315,29 +297,29 @@ export default function ProductDetailPage({
                 Bu Kategorideki Diğer Bileşenler
               </h3>
               <p className="text-xs text-stone-500 dark:text-stone-400">
-                Aynı konteynere ekleyebileceğiniz tamamlayıcı yatak malzemeleri.
+                Teklif listenize ekleyebileceğiniz tamamlayıcı yatak malzemeleri.
               </p>
             </div>
             <button
               onClick={onBack}
-              className="text-xs font-semibold text-[#8C7A58] dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-xs font-semibold text-[#8C7A58] dark:text-[#D4B37F] hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>Tümünü Gör</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {relatedProducts.map(rel => (
               <div
                 key={rel.id}
                 onClick={() => onSelectProduct(rel)}
-                className="liquid-glass rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.02] transition-all duration-300 p-4 border border-stone-200/60 dark:border-white/10"
+                className="rounded-2xl overflow-hidden cursor-pointer group bg-white dark:bg-[#121216] border border-stone-200/80 dark:border-white/10 hover:border-[#8C7A58] dark:hover:border-[#D4B37F] transition-colors p-3.5"
               >
                 <div className="aspect-4/3 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-900 mb-3 relative">
-                  <img src={rel.thumb} alt={rel.name} className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" />
+                  <img src={rel.thumb} alt={rel.name} className="w-full h-full object-cover" />
                 </div>
-                <h4 className="font-serif text-base font-bold text-stone-900 dark:text-white truncate">
+                <h4 className="font-serif text-base font-semibold text-stone-900 dark:text-white truncate group-hover:text-[#8C7A58] dark:group-hover:text-[#D4B37F] transition-colors">
                   {rel.name}
                 </h4>
                 <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-1 mt-0.5">

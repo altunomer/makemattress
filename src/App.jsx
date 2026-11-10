@@ -14,6 +14,8 @@ import AdminPage from './pages/AdminPage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import PdfCatalogModal from './components/PdfCatalogModal';
+import { getPdfFromIndexedDB } from './utils/pdfStorage';
+import LanguageSuggestionModal from './components/LanguageSuggestionModal';
 import BackToTopButton from './components/BackToTopButton';
 
 import {
@@ -216,29 +218,57 @@ export default function App() {
   };
 
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [containerItems, setContainerItems] = useState([
-    initialProducts[0], // Mattress Tape
-    initialProducts[1]  // PE Films
-  ]);
+  const [containerItems, setContainerItems] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('makemattress_container');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return [];
+  });
+
+  // Persist user's container items to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('makemattress_container', JSON.stringify(containerItems));
+    } catch (e) {}
+  }, [containerItems]);
 
   const [isContainerDrawerOpen, setIsContainerDrawerOpen] = useState(false);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
-  // PDF Catalog Source State
+  // PDF Catalog Source State with IndexedDB Persistence (No 5MB size limit)
   const [catalogPdf, setCatalogPdf] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('makemattress_catalog_pdf');
-      if (saved) return saved;
+      if (saved && !saved.startsWith('data:')) return saved;
     }
     return '/catalog/makemattress-catalog-2026.pdf';
   });
 
+  // Persistent IndexedDB catalog synchronization (survives hard refreshes & browser restarts)
+  useEffect(() => {
+    let isMounted = true;
+    getPdfFromIndexedDB().then((res) => {
+      if (isMounted && res && res.url) {
+        setCatalogPdf(res.url);
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
   const handleUpdateCatalogPdf = (newPdf) => {
     setCatalogPdf(newPdf);
-    try {
-      localStorage.setItem('makemattress_catalog_pdf', newPdf);
-    } catch (e) {
-      console.warn('Could not persist catalog PDF to localStorage:', e);
+    if (typeof newPdf === 'string' && !newPdf.startsWith('blob:') && !newPdf.startsWith('data:')) {
+      try {
+        localStorage.setItem('makemattress_catalog_pdf', newPdf);
+      } catch (e) {
+        console.warn('Could not persist catalog PDF to localStorage:', e);
+      }
     }
   };
 
@@ -318,6 +348,8 @@ export default function App() {
 
       {/* 1. Liquid Glass 3-Capsule Detached Sticky Navbar with Mega Dropdown */}
       <Header
+        categories={categories}
+        products={products}
         activeLang={activeLang}
         setActiveLang={handleLanguageChange}
         cartCount={containerItems.length}
@@ -393,20 +425,17 @@ export default function App() {
         {/* VIEW C: FULL HOME LANDING PAGE */}
         {routeInfo.view === 'home' && (
           <>
-            {/* Cinematic Liquid Glass Hero Slider */}
+            {/* 1. Asymmetric Clockwork-style Hero Showcase */}
             <HeroSlider
               slides={sliders}
               activeLang={activeLang}
+              onOpenPdfCatalog={() => setIsPdfModalOpen(true)}
             />
 
-            {/* B2B Sourcing Value Pillars - Overlapping Slider by ~25% */}
-            <ValuePillars
-              activeLang={activeLang}
-            />
-
-            {/* Comprehensive Product Catalog - Click navigates to Single Product Page */}
+            {/* 2. Direct Clockwork-style Split Catalog (Control Panel + Tile Grid) */}
             <ProductCatalog
               products={products}
+              categories={categories}
               activeLang={activeLang}
               onSelectProduct={navigateToProduct}
               onToggleContainerItem={handleToggleContainerItem}
@@ -414,7 +443,12 @@ export default function App() {
               onOpenPdfCatalog={() => setIsPdfModalOpen(true)}
             />
 
-            {/* Quality Control & Transparency Story */}
+            {/* 3. B2B Sourcing Value Pillars & Foundation */}
+            <ValuePillars
+              activeLang={activeLang}
+            />
+
+            {/* 4. Quality Control & Transparency Story */}
             <QualityControlSection
               activeLang={activeLang}
             />
@@ -477,6 +511,14 @@ export default function App() {
         onClear={handleClearContainer}
         activeLang={activeLang}
       />
+
+      {/* Non-intrusive, SEO-safe Delayed Region/Language Suggestion */}
+      {routeInfo.view !== 'admin' && (
+        <LanguageSuggestionModal
+          activeLang={activeLang}
+          onSwitchLanguage={handleLanguageChange}
+        />
+      )}
 
       {/* Polite Round Liquid Glass Back to Top Sticky Button */}
       <BackToTopButton />
